@@ -1,7 +1,6 @@
-import ulogconv as conv
+from uloganalysis import ulogconv as conv
 import pandas as pd 
 import numpy as np 
-import mathpandas as mpd
 import argparse
 import os
 import matplotlib.pyplot as plt
