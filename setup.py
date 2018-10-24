@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="uloganalysis",
-    version="0.0.1",
+    version="0.0.3",
     author="Dennis Mannhart",
     author_email="dennis.mannhart@gmail.com",
     description="A package to analys ulog files using pandas",
@@ -15,7 +15,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: BSD 3-Clause",
         "Operating System :: OS Independent",
     ],
 )
