@@ -1,11 +1,10 @@
 """
-Script convert ulog file to different data structure
+Convert ulog file to different data structure
 """
 
 import pyulog
 import pandas as pd
 import re
-import matplotlib.pyplot as plt
 
 def createPandaDict(ULog):
     """
@@ -103,10 +102,3 @@ def combineTopicFieldName(pandadict):
                 ncol[col] = topic + '__' + col
         pandadict[topic].rename(columns=ncol, inplace=True)
     return
-
-if __name__ == "__main__":  
-    ulog = pyulog.ULog('logs/15713dd7-7a77-4bd9-bfe5-17a74a278077.ulg', ['vehicle_local_position', 'vehicle_local_position_setpoint'])      
-    pdd=createPandaDict(ulog)
-    m = merge(pdd)
-    m.plot(x='timestamp')
-    plt.show()
