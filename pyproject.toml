@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "uloganalysis"
+author = "Dennis Mannhart"
+author-email = "dennis.mannhart@gmail.com"
+home-page = "https://github.com/YUNEEC/ulogAnalysis"
+requires=[        
+        "matplotlib (>= 3.0.0)",
+        "numpy (>= 1.15.3)",
+        "pandas (>= 0.23.4)",
+        "pyulog (>= 0.6.0)",
+        "transforms3d"]
+requires-python='>=3.5'
+description-file='README.md'
+classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent']
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest",
+]
+
+[tool.flit.scripts]
+px4_attitude = "uloganalysis.attitudeanalysis:main"
