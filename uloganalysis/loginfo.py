@@ -20,8 +20,8 @@ def get_duration(ulog):
     return "{:d}:{:02d}:{:02d}".format(h2, m2, s2)
 
 
-def get_date(log):
-    gps_data = log.get_dataset("vehicle_gps_position")
+def get_date(ulog):
+    gps_data = ulog.get_dataset("vehicle_gps_position")
     indices = np.nonzero(gps_data.data["time_utc_usec"])
     if len(indices[0]) > 0:
         return datetime.datetime.fromtimestamp(
@@ -31,8 +31,8 @@ def get_date(log):
         return None
 
 
-def get_param(log, parameter_name, default):
-    if parameter_name in log.initial_parameters.keys():
-        return log.initial_parameters[parameter_name]
+def get_param(ulog, parameter_name, default):
+    if parameter_name in ulog.initial_parameters.keys():
+        return ulog.initial_parameters[parameter_name]
     else:
         return default
