@@ -5,6 +5,8 @@ import os
 import pyulog
 from uloganalysis import ulogconv as conv
 from uloganalysis import mathpandas as mpd
+from uloganalysis import plotwrapper as pltw
+from uloganalysis import loginfo
 
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
@@ -188,7 +190,10 @@ def main():
 
     with PdfPages("px4_attitude.pdf") as pdf:
 
-        df = get_attitude_state_setpoint_from_file(args.filename)
+        topics = ["vehicle_attitude", "vehicle_attitude_setpoint"]
+        ulog = pyulog.ULog(args.filename, topics)
+        pandadict = conv.createPandaDict(ulog)
+        df = conv.merge(pandadict)
         df.timestamp = (
             df.timestamp - df.timestamp[0]
         ) * 1e-6  # change to seconds
@@ -198,18 +203,18 @@ def main():
         add_euler_error(df)
 
         plt.figure(0, figsize=(20, 13))
-        df_euler = df[
+        df_tmp = df[
             [
                 "timestamp",
                 "T_vehicle_attitude_setpoint_0__F_e_roll",
                 "T_vehicle_attitude_setpoint_0__F_e_pitch",
                 "T_vehicle_attitude_setpoint_0__F_e_yaw",
             ]
-        ]
-        df_euler.plot(x="timestamp", linewidth=1)
+        ].copy()
+        df_tmp.plot(x="timestamp", linewidth=0.8)
+        pltw.plot_time_series(df_tmp, plt)
         plt.title("Roll-Pitch-Yaw-Error")
         plt.ylabel("rad")
-        plt.grid()
         pdf.savefig()
         plt.close(0)
 
@@ -217,11 +222,13 @@ def main():
         add_vehicle_z_axis(df)
         add_vehicle_inverted(df)
         plt.figure(1, figsize=(20, 13))
-        df_euler = df[["timestamp", "T_vehicle_attitude_0__F_tilt_more_90"]]
-        df_euler.plot(x="timestamp", linewidth=1)
+        df_tmp = df[
+            ["timestamp", "T_vehicle_attitude_0__F_tilt_more_90"]
+        ].copy()
+        df_tmp.plot(x="timestamp", linewidth=0.8)
+        pltw.plot_time_series(df_tmp, plt)
         plt.title("Inverted")
         plt.ylabel("boolean")
-        plt.grid()
         pdf.savefig()
         plt.close(1)
 
@@ -229,16 +236,22 @@ def main():
         add_desired_z_axis(df)
         add_desired_tilt(df)
         add_tilt(df)
+        pos_tilt = loginfo.get_param(ulog, "MPC_TILTMAX_AIR", 0)
+        man_tilt = loginfo.get_param(ulog, "MPC_MAN_TILT_MAX", 0)
         plt.figure(2, figsize=(20, 13))
-        df[
+        df_tmp = df[
             [
                 "timestamp",
                 "T_vehicle_attitude_0__F_tilt",
                 "T_vehicle_attitude_setpoint_0__F_tilt_desired",
             ]
-        ].plot(x="timestamp", linewidth=1)
+        ].copy()
+        df_tmp["MPC_TILTMAX_AIR"] = pos_tilt * np.pi / 180
+        df_tmp["MPC_MAN_TILT_MAX"] = man_tilt * np.pi / 180
+        df_tmp.plot(x="timestamp", linewidth=0.8, style=["-", "-", "--", "--"])
+
+        pltw.plot_time_series(df_tmp, plt)
         plt.title("Tilt / Desired Tilt")
         plt.ylabel("rad")
-        plt.grid()
         pdf.savefig()
         plt.close(2)
