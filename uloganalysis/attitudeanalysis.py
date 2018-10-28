@@ -131,9 +131,9 @@ def add_tilt(df):
         df["T_vehicle_attitude_0__F_body_z_axis_z"],
     )
     df["T_vehicle_attitude_0__F_tilt"] = tilt.values
-    df["T_vehicle_attitude_0__F_tilt"] = df["T_vehicle_attitude_0__F_tilt"].apply(
-        np.arccos
-    )
+    df["T_vehicle_attitude_0__F_tilt"] = df[
+        "T_vehicle_attitude_0__F_tilt"
+    ].apply(np.arccos)
 
 
 def add_vehicle_inverted(df):
