@@ -2,10 +2,12 @@ import pandas as pd
 import numpy as np
 import argparse
 import os
-import matplotlib.pyplot as plt
 import pyulog
 from uloganalysis import ulogconv as conv
 from uloganalysis import mathpandas as mpd
+
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="Script to process attitude")
 parser.add_argument("filename", metavar="file.ulg", help="ulog file")
@@ -34,14 +36,15 @@ def get_attitude_state_setpoint_from_file(f):
 
 
 def add_roll_pitch_yaw(df):
-    df["T_vehicle_attitude_0__F_roll"],
-    df["T_vehicle_attitude_0__F_pitch"],
-    df["T_vehicle_attitude_0__F_yaw"] = mpd.series_quat2euler(
+    roll, pitch, yaw = mpd.series_quat2euler(
         df["T_vehicle_attitude_0__F_q_0"],
         df["T_vehicle_attitude_0__F_q_1"],
         df["T_vehicle_attitude_0__F_q_2"],
         df["T_vehicle_attitude_0__F_q_3"],
     )
+    df["T_vehicle_attitude_0__F_roll"] = roll.values
+    df["T_vehicle_attitude_0__F_pitch"] = pitch.values
+    df["T_vehicle_attitude_0__F_yaw"] = yaw.values
 
 
 def add_euler_error(df):
@@ -183,41 +186,59 @@ def main():
     args = parser.parse_args()
     check_directory(args.filename)
 
-    df = get_attitude_state_setpoint_from_file(args.filename)
-    df.timestamp = (df.timestamp - df.timestamp[0]) * 1e-6  # change to seconds
-    # add_roll_pitch_yaw(df)
-    # add_euler_error(df)
-    # add_vehicle_z_axis(df)
-    # add_vehicle_inverted(df)
-    # dd_desired_z_axis(df)
-    # add_desired_tilt(df)
-    add_tilt(df)
-    print(df["T_vehicle_attitude_0__F_tilt"] * (180 / np.pi))
+    with PdfPages("px4_attitude.pdf") as pdf:
 
-    # # plot roll / pitch / yaw error
-    # df_euler = df[['timestamp','T_vehicle_attitude_setpoint_0__F_e_roll',
-    #                  'T_vehicle_attitude_setpoint_0__F_e_pitch',
-    #                  'T_vehicle_attitude_setpoint_0__F_e_yaw']]
-    # df_euler.plot(x='timestamp')
+        df = get_attitude_state_setpoint_from_file(args.filename)
+        df.timestamp = (
+            df.timestamp - df.timestamp[0]
+        ) * 1e-6  # change to seconds
 
-    # # plot inverted
-    # df_inverted = df[['timestamp','T_vehicle_attitude_0__F_tilt_more_90']]
-    # df_inverted.plot(x='timestamp', y='T_vehicle_attitude_0__F_tilt_more_90')
+        # roll pitch and yaw error
+        add_roll_pitch_yaw(df)
+        add_euler_error(df)
 
-    # # plot desired z-axis
-    # df[['timestamp', 'T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_x',
-    #                  'T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_y',
-    #                  'T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_z']].plot(x='timestamp')
+        plt.figure(0, figsize=(20, 13))
+        df_euler = df[
+            [
+                "timestamp",
+                "T_vehicle_attitude_setpoint_0__F_e_roll",
+                "T_vehicle_attitude_setpoint_0__F_e_pitch",
+                "T_vehicle_attitude_setpoint_0__F_e_yaw",
+            ]
+        ]
+        df_euler.plot(x="timestamp", linewidth=1)
+        plt.title("Roll-Pitch-Yaw-Error")
+        plt.ylabel("rad")
+        plt.grid()
+        pdf.savefig()
+        plt.close(0)
 
-    # # plot tilt and desired tilt
-    # df[['timestamp', 'T_vehicle_attitude_setpoint_0__F_tilt_desired']].plot(x='timestamp')
-    df[["timestamp", "T_vehicle_attitude_0__F_tilt"]].plot(x="timestamp")
+        # inverted
+        add_vehicle_z_axis(df)
+        add_vehicle_inverted(df)
+        plt.figure(1, figsize=(20, 13))
+        df_euler = df[["timestamp", "T_vehicle_attitude_0__F_tilt_more_90"]]
+        df_euler.plot(x="timestamp", linewidth=1)
+        plt.title("Inverted")
+        plt.ylabel("boolean")
+        plt.grid()
+        pdf.savefig()
+        plt.close(1)
 
-    # # add radians
-    # df['T_vehicle_attitude_setpoint_0__F_tilt_desired_deg'] =
-    # df['T_vehicle_attitude_setpoint_0__F_tilt_desired'].values * 180 /np.pi
-    # df['T_vehicle_attitude_0__F_tilt_deg'] = df['T_vehicle_attitude_0__F_tilt'].values * 180 /np.pi
-    # df[['timestamp', 'T_vehicle_attitude_0__F_tilt_deg',
-    # 'T_vehicle_attitude_setpoint_0__F_tilt_desired_deg']].plot(x='timestamp')
-
-    plt.show()  # show all plots
+        # tilt and desired tilt
+        add_desired_z_axis(df)
+        add_desired_tilt(df)
+        add_tilt(df)
+        plt.figure(2, figsize=(20, 13))
+        df[
+            [
+                "timestamp",
+                "T_vehicle_attitude_0__F_tilt",
+                "T_vehicle_attitude_setpoint_0__F_tilt_desired",
+            ]
+        ].plot(x="timestamp", linewidth=1)
+        plt.title("Tilt / Desired Tilt")
+        plt.ylabel("rad")
+        plt.grid()
+        pdf.savefig()
+        plt.close(2)
