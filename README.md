@@ -2,7 +2,9 @@
 Simple scripts to analyse ulog data using pandas python package
 
 ## Installation
-To prevent any conflict with the system python version, it is suggested to use a virtual enrionment with python version 3 and higher. 
+To prevent any conflict with the system python version, it is suggested to use a virtual enrionment with python version 3.6 and higher. Otherwise, python 3.6 and higher must be the python system version.
+If you don't have 3.6 installed on your machinge, you can follow this [tutorial](http://ubuntuhandbook.org/index.php/2017/07/install-python-3-6-1-in-ubuntu-16-04-lts/).
+
 
 ### virtualenvwrapper
 
@@ -49,7 +51,30 @@ To exit [name-of-new-env]:
 deactivate
 ```
 
-Once you are in [name-of-new-env], you then can install the requirements from the `requirements.txt` file.
-```bash 
-pip install -r requirements.txt
+### installation setup
+
+The build-system in use is [flit](https://flit.readthedocs.io/en/latest/)
+```bash
+pip install flit
 ```
+
+The projcet uses [black](https://github.com/ambv/black) for code-formatting and [flake8](https://pypi.org/project/flake8/) for style-guide enforcement. [pre-commit-framework](https://github.com/pre-commit/pre-commit) is used to ensure that each commit first gets adjusted through `blake` and then checked by `flake8`. First, we need to add `pre-commit` to our
+system:
+```bash
+pre-commit install
+```
+
+Now we can build the projct:
+```
+flit install -s
+```
+The `-s` stands for symlink which gives the option to test changes without reinstalling the package.
+
+To test if everything is setup correctly, you can run the `px4_attitude`-script, which creates a pdf with a few plots in it. Make sure that the path to the ulg-file exists. 
+```bash
+px4_attitude logs/cd6d8090-8c7f-41e5-bf62-3c95cc09fba1.ulg
+```
+
+
+
+
