@@ -8,8 +8,11 @@ from uloganalysis import mathpandas as mpd
 from uloganalysis import plotwrapper as pltw
 from uloganalysis import loginfo
 
-from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 parser = argparse.ArgumentParser(description="Script to process attitude")
 parser.add_argument("filename", metavar="file.ulg", help="ulog file")
