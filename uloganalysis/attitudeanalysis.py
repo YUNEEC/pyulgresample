@@ -9,7 +9,8 @@ from uloganalysis import plotwrapper as pltw
 from uloganalysis import loginfo
 
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -115,6 +116,9 @@ def add_desired_tilt(df):
         df["T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_y"],
         df["T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_z"],
     )
+    tilt.where(
+        tilt < 1, 1, inplace=True
+    )  # ensure that angle 1 is never exceeded
     df["T_vehicle_attitude_setpoint_0__NF_tilt_desired"] = tilt.values
     df["T_vehicle_attitude_setpoint_0__NF_tilt_desired"] = df[
         "T_vehicle_attitude_setpoint_0__NF_tilt_desired"
@@ -138,6 +142,9 @@ def add_tilt(df):
         df["T_vehicle_attitude_0__NF_body_z_axis_y"],
         df["T_vehicle_attitude_0__NF_body_z_axis_z"],
     )
+    tilt.where(
+        tilt < 1, 1, inplace=True
+    )  # ensure that angle 1 is never exceeded
     df["T_vehicle_attitude_0__NF_tilt"] = tilt.values
     df["T_vehicle_attitude_0__NF_tilt"] = df[
         "T_vehicle_attitude_0__NF_tilt"
@@ -239,6 +246,7 @@ def main():
         add_desired_z_axis(df)
         add_desired_tilt(df)
         add_tilt(df)
+
         pos_tilt = loginfo.get_param(ulog, "MPC_TILTMAX_AIR", 0)
         man_tilt = loginfo.get_param(ulog, "MPC_MAN_TILT_MAX", 0)
         plt.figure(2, figsize=(20, 13))
