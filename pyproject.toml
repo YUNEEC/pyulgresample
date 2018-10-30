@@ -12,8 +12,9 @@ requires=[
         "numpy (>= 1.15.3)",
         "pandas (>= 0.23.4)",
         "pyulog (>= 0.6.0)",
-        "transforms3d"]
-requires-python='>=3.5'
+        "transforms3d",
+]
+requires-python='>=3.6'
 description-file='README.md'
 classifiers=[
         'Development Status :: 3 - Alpha',
@@ -24,11 +25,12 @@ classifiers=[
         'Operating System :: OS Independent']
 
 [tool.flit.metadata.requires-extra]
+requires = [
+        "flake8",
+        "pre-commit",
+]
 test = [
-    "pytest",
-    "black",
-    "flake8",
-    "pre-commit"
+    "pytest"
 ]
 
 [tool.flit.scripts]
