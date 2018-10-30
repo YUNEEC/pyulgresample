@@ -47,23 +47,23 @@ def add_roll_pitch_yaw(df):
         df["T_vehicle_attitude_0__F_q_2"],
         df["T_vehicle_attitude_0__F_q_3"],
     )
-    df["T_vehicle_attitude_0__F_roll"] = roll.values
-    df["T_vehicle_attitude_0__F_pitch"] = pitch.values
-    df["T_vehicle_attitude_0__F_yaw"] = yaw.values
+    df["T_vehicle_attitude_0__NF_roll"] = roll.values
+    df["T_vehicle_attitude_0__NF_pitch"] = pitch.values
+    df["T_vehicle_attitude_0__NF_yaw"] = yaw.values
 
 
 def add_euler_error(df):
-    df["T_vehicle_attitude_setpoint_0__F_e_roll"] = mpd.angle_wrap(
+    df["T_vehicle_attitude_setpoint_0__NF_e_roll"] = mpd.angle_wrap(
         df["T_vehicle_attitude_setpoint_0__F_roll_body"]
-        - df["T_vehicle_attitude_0__F_roll"]
+        - df["T_vehicle_attitude_0__NF_roll"]
     )
-    df["T_vehicle_attitude_setpoint_0__F_e_pitch"] = mpd.angle_wrap(
+    df["T_vehicle_attitude_setpoint_0__NF_e_pitch"] = mpd.angle_wrap(
         df["T_vehicle_attitude_setpoint_0__F_pitch_body"]
-        - df["T_vehicle_attitude_0__F_pitch"]
+        - df["T_vehicle_attitude_0__NF_pitch"]
     )
-    df["T_vehicle_attitude_setpoint_0__F_e_yaw"] = mpd.angle_wrap(
+    df["T_vehicle_attitude_setpoint_0__NF_e_yaw"] = mpd.angle_wrap(
         df["T_vehicle_attitude_setpoint_0__F_yaw_body"]
-        - df["T_vehicle_attitude_0__F_yaw"]
+        - df["T_vehicle_attitude_0__NF_yaw"]
     )
 
 
@@ -71,17 +71,17 @@ def add_vehicle_z_axis(df):
     x = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_0__F_body_z_axis_x",
+        name="T_vehicle_attitude_0__NF_body_z_axis_x",
     )
     y = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_0__F_body_z_axis_y",
+        name="T_vehicle_attitude_0__NF_body_z_axis_y",
     )
     z = pd.Series(
         np.ones(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_0__F_body_z_axis_z",
+        name="T_vehicle_attitude_0__NF_body_z_axis_z",
     )
     x, y, z = mpd.series_quatrot(
         x,
@@ -100,7 +100,7 @@ def add_vehicle_z_axis(df):
 
 def add_desired_tilt(df):
 
-    if "T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_x" not in df:
+    if "T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_x" not in df:
         add_desired_z_axis(df)
 
     x = pd.Series(np.zeros(df.shape[0]), index=df["timestamp"], name="x")
@@ -111,19 +111,19 @@ def add_desired_tilt(df):
         x,
         y,
         z,
-        df["T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_x"],
-        df["T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_y"],
-        df["T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_z"],
+        df["T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_x"],
+        df["T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_y"],
+        df["T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_z"],
     )
-    df["T_vehicle_attitude_setpoint_0__F_tilt_desired"] = tilt.values
-    df["T_vehicle_attitude_setpoint_0__F_tilt_desired"] = df[
-        "T_vehicle_attitude_setpoint_0__F_tilt_desired"
+    df["T_vehicle_attitude_setpoint_0__NF_tilt_desired"] = tilt.values
+    df["T_vehicle_attitude_setpoint_0__NF_tilt_desired"] = df[
+        "T_vehicle_attitude_setpoint_0__NF_tilt_desired"
     ].apply(np.arccos)
 
 
 def add_tilt(df):
 
-    if "T_vehicle_attitude_0__F_body_z_axis_x" not in df:
+    if "T_vehicle_attitude_0__NF_body_z_axis_x" not in df:
         add_vehicle_z_axis(df)
 
     x = pd.Series(np.zeros(df.shape[0]), index=df["timestamp"], name="x")
@@ -134,43 +134,43 @@ def add_tilt(df):
         x,
         y,
         z,
-        df["T_vehicle_attitude_0__F_body_z_axis_x"],
-        df["T_vehicle_attitude_0__F_body_z_axis_y"],
-        df["T_vehicle_attitude_0__F_body_z_axis_z"],
+        df["T_vehicle_attitude_0__NF_body_z_axis_x"],
+        df["T_vehicle_attitude_0__NF_body_z_axis_y"],
+        df["T_vehicle_attitude_0__NF_body_z_axis_z"],
     )
-    df["T_vehicle_attitude_0__F_tilt"] = tilt.values
-    df["T_vehicle_attitude_0__F_tilt"] = df[
-        "T_vehicle_attitude_0__F_tilt"
+    df["T_vehicle_attitude_0__NF_tilt"] = tilt.values
+    df["T_vehicle_attitude_0__NF_tilt"] = df[
+        "T_vehicle_attitude_0__NF_tilt"
     ].apply(np.arccos)
 
 
 def add_vehicle_inverted(df):
 
-    if "T_vehicle_attitude_0__F_body_z_axis_z" not in df:
+    if "T_vehicle_attitude_0__NF_body_z_axis_z" not in df:
         add_vehicle_z_axis(df)
 
     df[
-        "T_vehicle_attitude_0__F_tilt_more_90"
-    ] = df.T_vehicle_attitude_0__F_body_z_axis_z.values
-    df[df[["T_vehicle_attitude_0__F_tilt_more_90"]] >= 0] = 0
-    df[df[["T_vehicle_attitude_0__F_tilt_more_90"]] < 0] = 1
+        "T_vehicle_attitude_0__NF_tilt_more_90"
+    ] = df.T_vehicle_attitude_0__NF_body_z_axis_z.values
+    df[df[["T_vehicle_attitude_0__NF_tilt_more_90"]] >= 0] = 0
+    df[df[["T_vehicle_attitude_0__NF_tilt_more_90"]] < 0] = 1
 
 
 def add_desired_z_axis(df):
     x = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_x",
+        name="T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_x",
     )
     y = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_y",
+        name="T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_y",
     )
     z = pd.Series(
         np.ones(df.shape[0]),
         index=df["timestamp"],
-        name="T_vehicle_attitude_setpoint_0__F_body_z_axis_sp_z",
+        name="T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_z",
     )
 
     x, y, z = mpd.series_quatrot(
@@ -209,9 +209,9 @@ def main():
         df_tmp = df[
             [
                 "timestamp",
-                "T_vehicle_attitude_setpoint_0__F_e_roll",
-                "T_vehicle_attitude_setpoint_0__F_e_pitch",
-                "T_vehicle_attitude_setpoint_0__F_e_yaw",
+                "T_vehicle_attitude_setpoint_0__NF_e_roll",
+                "T_vehicle_attitude_setpoint_0__NF_e_pitch",
+                "T_vehicle_attitude_setpoint_0__NF_e_yaw",
             ]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
@@ -226,7 +226,7 @@ def main():
         add_vehicle_inverted(df)
         plt.figure(1, figsize=(20, 13))
         df_tmp = df[
-            ["timestamp", "T_vehicle_attitude_0__F_tilt_more_90"]
+            ["timestamp", "T_vehicle_attitude_0__NF_tilt_more_90"]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
         pltw.plot_time_series(df_tmp, plt)
@@ -245,8 +245,8 @@ def main():
         df_tmp = df[
             [
                 "timestamp",
-                "T_vehicle_attitude_0__F_tilt",
-                "T_vehicle_attitude_setpoint_0__F_tilt_desired",
+                "T_vehicle_attitude_0__NF_tilt",
+                "T_vehicle_attitude_setpoint_0__NF_tilt_desired",
             ]
         ].copy()
         df_tmp["MPC_TILTMAX_AIR"] = pos_tilt * np.pi / 180
