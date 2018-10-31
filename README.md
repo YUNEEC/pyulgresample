@@ -19,18 +19,18 @@ For instance, the `thrust`-field of the message [vehicle_local_position_setpoint
 
 > T_vehicle_local_position_setpoint_0__F_thrust_x
 
-if the field `x` of `vehicle_local_position_setpoint` is a scalar of 
+if the field `x` of `vehicle_local_position_setpoint` is a scalar or 
 
 > T_vehicle_local_position_setpoint_0__F_x_0
 
-if the field `x` would be an array, where the 0 indicates the index of the array. 
+if the field `x` is an array, where the 0 represents the index of the array. 
 
-The `T` stands for topic, which indicates the begining of the topic. In this example, the topcic name is 
-`vehicle_local_position_setpoint`. The topic name is followed by a number, which indicates the topic instance. If there is only one instance of a specific topic, then this number will be `0`. The instance nmber is followed by two underlines and a capital letter `F`, which stands for field. In the example above, the field in question is `x`. 
+The `T` stands for topic, which indicates the beginning of the topic. In this example, the topcic name is 
+`vehicle_local_position_setpoint`. The topic name is followed by a number, which indicates the topic instance. If there is only one instance of a specific topic, then this number will be `0`. The instance number is followed by two underlines and a capital letter `F`, which stands for field. In the example above, the field in question is `x`. 
 
 Informaiton can also be generated from the given `.ulg` data. If a new field is generated (for instance tilt-field can be generated from the attitude topic), then this new field message will have a `NF` instead of `F` to indicate the start of the field. 
 
-## Installation
+## installation
 To prevent any conflict with the system python version, it is suggested to use a virtual enrionment with python version 3.6 and higher. Otherwise, python 3.6 and higher must be the python system version.
 If you don't have 3.6 installed on your machinge, you can follow this [tutorial](http://ubuntuhandbook.org/index.php/2017/07/install-python-3-6-1-in-ubuntu-16-04-lts/).
 
@@ -80,7 +80,7 @@ To exit [name-of-new-env]:
 deactivate
 ```
 
-### installation setup
+### build setup
 
 The build-system in use is [flit](https://flit.readthedocs.io/en/latest/)
 ```bash
