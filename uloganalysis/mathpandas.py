@@ -70,3 +70,14 @@ def series_dot(x0, y0, z0, x1, y1, z1, dotname=""):
         ]
     )
     return pd.Series(name=dotname, data=dot, index=x0.index)
+
+
+def series_pythagoras(x0, y0, dotname=""):
+    """
+    Given pandas series x0-y0,
+    compute absolute horizontal distance
+    """
+    pythagoras = np.array(
+        [np.linalg.norm([x0i, y0i], axis=0) for x0i, y0i in zip(x0, y0)]
+    )
+    return pd.Series(name=dotname, data=pythagoras, index=x0.index)
