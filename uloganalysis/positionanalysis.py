@@ -67,7 +67,6 @@ def main():
         topics = [
             "vehicle_local_position",
             "vehicle_local_position_setpoint",
-            "vehicle_status",
         ]
         ulog = pyulog.ULog(args.filename, topics)
         pandadict = conv.createPandaDict(ulog)
