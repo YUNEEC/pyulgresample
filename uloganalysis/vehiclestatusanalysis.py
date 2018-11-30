@@ -49,10 +49,9 @@ def main():
     with PdfPages("px4_vehicle_status.pdf") as pdf:
 
         topics = [
-            "vehicle_local_position",
-            "vehicle_local_position_setpoint",
-            "vehicle_status",
+
         ]
+
         ulog = pyulog.ULog(args.filename, topics)
         pandadict = conv.createPandaDict(ulog)
         df = conv.merge(pandadict)
@@ -60,14 +59,4 @@ def main():
             df.timestamp - df.timestamp[0]
         ) * 1e-6  # change to seconds
 
-        print_pdf(
-            df,
-            pdf,
-            "T_vehicle_status_0__F_nav_state",
-            "T_vehicle_status_0__F_nav_state",
-            "vehicle status",
-            "-",
-            0,
-        )
-
-        print("PDF was created")
+        # print("PDF was created")
