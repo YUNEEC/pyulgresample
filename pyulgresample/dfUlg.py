@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import os
-from uloganalysis import loginfo
-from uloganalysis import ulogconv as conv
+from pyulgresample import loginfo
+from pyulgresample import ulogconv as conv
 
 
 class dfUlgBase(metaclass=ABCMeta):

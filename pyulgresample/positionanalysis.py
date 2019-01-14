@@ -3,11 +3,11 @@ import numpy as np
 import argparse
 import os
 import pyulog
-from uloganalysis import ulogconv as conv
-from uloganalysis import mathpandas as mpd
-from uloganalysis import plotwrapper as pltw
-from uloganalysis import loginfo
-from uloganalysis import dfUlg
+from pyulgresample import ulogconv as conv
+from pyulgresample import mathpandas as mpd
+from pyulgresample import plotwrapper as pltw
+from pyulgresample import loginfo
+from pyulgresample import dfUlg
 
 import matplotlib
 
