@@ -1,4 +1,4 @@
-# ulogAnalysis
+# pyulgresample
 Package that processes ulog-data from [pyulog](https://github.com/PX4/pyulog). It converts ulog-data into pandas dataframe through resampling and provides convenient functions to add and extract additional information from the ulog-data. 
 To convert a `.ulg` file into `ulog`, please follow [pyulog](https://github.com/PX4/pyulog).
 With the `ulogconv` module the `ulog` can then be farther processed into a panda dict:
