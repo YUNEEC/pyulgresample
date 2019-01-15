@@ -36,7 +36,7 @@ class dfUlgBase(metaclass=ABCMeta):
             raise Exception("File does not exist")
 
     @classmethod
-    def create(cls, filepath, topics=None, zoh_topics=None):
+    def create(cls, filepath, additional_topics=None, additional_zoh_topics=None):
         """
         Factory method to create a dfulgBase object
 
@@ -57,12 +57,16 @@ class dfUlgBase(metaclass=ABCMeta):
             zoh_topics: topics which are resampled through zoh
         """
 
+        # bind argument to new name such that they are not overwritten by accident
+        topics = additional_topics
+        zoh_topics = additional_zoh_topics
+
         # check if valid file is provided
         cls._check_file(filepath)
 
         # Add required topics to topics if not already present
         if topics is not None:
-            topics = topics.extend(
+            topics.extend(
                 x for x in cls.get_required_topics() if x not in topics
             )
         else:
