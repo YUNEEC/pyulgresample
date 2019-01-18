@@ -4,6 +4,12 @@ from pyulgresample import loginfo
 from pyulgresample import ulogconv as conv
 
 
+class TopicMsgs:
+    def __init__(self, topic, msgs):
+        self.topic = topic
+        self.msgs = msgs
+
+
 class dfUlgBase(metaclass=ABCMeta):
     """
     Base class for converting .ulg file into ulog-structure and pandas-dataframe
@@ -36,7 +42,9 @@ class dfUlgBase(metaclass=ABCMeta):
             raise Exception("File does not exist")
 
     @classmethod
-    def create(cls, filepath, additional_topics=None, additional_zoh_topics=None):
+    def create(
+        cls, filepath, additional_topics=None, additional_zoh_topics=None
+    ):
         """
         Factory method to create a dfulgBase object
 
@@ -86,7 +94,7 @@ class dfUlgBase(metaclass=ABCMeta):
             raise Exception("Ulog is empty")
 
         pandadict = conv.createPandaDict(ulog)
-        df = conv.merge(pandadict, zoh)
+        df = conv.merge(pandadict, zoh, cls.get_nan_topic_msgs())
         # change to seconds
         df.timestamp = (df.timestamp - df.timestamp[0]) * 1e-6
         return cls(df, ulog, topics)
@@ -94,15 +102,24 @@ class dfUlgBase(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def get_required_topics(self):
-        """
-        Abstract method to get required topic
-        """
-        pass
+        """ Abstract method to get required topics """
+        return []
 
     @classmethod
     @abstractmethod
     def get_required_zoh_topics(self):
+        """ Abstract method to get the topics on which zoh-resampling is applied """
+        return []
+
+    @classmethod
+    @abstractmethod
+    def get_nan_topic_msgs(self):
         """
-        Abstract method to get the topics on which zoh-resampling were applied.
+        Abstract method to get msg which contain NAN-information
+
+        An example topic is vehicle_local_position_setpoint, where the position msg x/y/z can contain
+        NAN-values, which indicates that this particular message was not used in the control loop.
+
+        returns list of TopicMsgs
         """
-        pass
+        return []

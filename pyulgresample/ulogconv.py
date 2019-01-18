@@ -65,11 +65,12 @@ def merge_asof(pandadict, on=None, direction=None):
     return m
 
 
-def merge(pandadict, topics_zero_order_hold=None):
+def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
     """
     pandas merge method applied to pandadict
     @params pandadict: a dictionary of pandas dataframe
-    @params column_zero_order_hold: by default merge will use linear
+    @params topics_zero_order_hold: by default merge will use linear interpolation
+    @params nan_topic_msgs: list of TopicMsgs where the msgs contain NAN values
             interpolation. column_zero_order_hold specifies which messages
             of pandadict are interpolated with zero-order-hold method.
     """
@@ -86,12 +87,29 @@ def merge(pandadict, topics_zero_order_hold=None):
             )
     m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
 
+    # apply zero order hold for topics that contain NAN
+    # TODO: handle NANs for linear interpolation
+    if nan_topic_msgs:
+        for t_nan in nan_topic_msgs:
+            regex = t_nan.topic + ".+"
+            if t_nan.msgs:
+                regex = regex + "["
+                for msg in t_nan.msgs:
+                    regex = "{0}({1})".format(regex, msg)
+                regex = regex + "]"
+
+            m[list(m.filter(regex=regex).columns)] = m[
+                list(m.filter(regex=regex).columns)
+            ].fillna(method="ffill")
+
     # apply zero order hold for some selected topics
     if topics_zero_order_hold is not None:
 
         for t in topics_zero_order_hold:
-            msg = 'T_'+ t + '*'
-            m[list(m.filter(regex=msg).columns)] = m[list(m.filter(regex=msg).columns)].fillna(method='ffill')
+            msg = "T_" + t + "*"
+            m[list(m.filter(regex=msg).columns)] = m[
+                list(m.filter(regex=msg).columns)
+            ].fillna(method="ffill")
 
     # apply interpolation to the whole dataframe (only NaN values get interpolated,
     # thus the zero order hold values from before do not get overwritten)

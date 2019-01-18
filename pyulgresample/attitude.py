@@ -40,6 +40,14 @@ class dfUlgAttitude(dfUlg.dfUlgBase):
         """
         return []
 
+    @classmethod
+    def get_nan_topic_msgs(self):
+        """
+        Returns:
+            list of TopicMsgs
+        """
+        return []
+
 
 def add_roll_pitch_yaw(df):
     roll, pitch, yaw = mpd.series_quat2euler(

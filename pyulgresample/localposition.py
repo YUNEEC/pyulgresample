@@ -40,6 +40,16 @@ class dfUlgPosition(dfUlg.dfUlgBase):
         """
         return []
 
+    @classmethod
+    def get_nan_topic_msgs(self):
+        """
+        Returns:
+            list of TopicMsgs
+        """
+        return [
+            dfUlg.TopicMsgs("vehicle_local_position_setpoint", ["x", "y", "z"])
+        ]
+
 
 def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
     # desired and measured x position

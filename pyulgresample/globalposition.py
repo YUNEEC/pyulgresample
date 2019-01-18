@@ -45,10 +45,15 @@ class dfUlgPositionGlobal(dfUlg.dfUlgBase):
         Returns:
             List of topics on which zoh is applied
         """
-        return [
-            "position_setpoint_triplet",
-            "vehicle_status"
-        ]
+        return ["position_setpoint_triplet", "vehicle_status"]
+
+    @classmethod
+    def get_nan_topic_msgs(self):
+        """
+        Returns:
+            list of TopicMsgs
+        """
+        return []
 
 
 def apply_UTM_constraints(df):
