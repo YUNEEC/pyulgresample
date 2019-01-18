@@ -35,8 +35,8 @@ test = [
 ]
 
 [tool.flit.scripts]
-px4_attitude = "pyulgresample.attitudeanalysis:main"
-px4_position = "pyulgresample.positionanalysis:main"
+px4_attitude = "pyulgresample.attitude:main"
+px4_position = "pyulgresample.localposition:main"
 px4_position_global = "pyulgresample.globalposition:main"
 
 [tool.black]
