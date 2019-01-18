@@ -43,12 +43,11 @@ class dfUlgPositionGlobal(dfUlg.dfUlgBase):
     def get_required_zoh_topics(cls):
         """
         Returns:
-            List of messages on which zoh is applied
+            List of topics on which zoh is applied
         """
         return [
-            "T_position_setpoint_triplet_0__F_current_lat",
-            "T_position_setpoint_triplet_0__F_current_lon",
-            "T_vehicle_status_0__F_nav_state",
+            "position_setpoint_triplet",
+            "vehicle_status"
         ]
 
 

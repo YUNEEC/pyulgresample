@@ -65,7 +65,7 @@ def merge_asof(pandadict, on=None, direction=None):
     return m
 
 
-def merge(pandadict, columns_zero_order_hold=None):
+def merge(pandadict, topics_zero_order_hold=None):
     """
     pandas merge method applied to pandadict
     @params pandadict: a dictionary of pandas dataframe
@@ -87,10 +87,11 @@ def merge(pandadict, columns_zero_order_hold=None):
     m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
 
     # apply zero order hold for some selected topics
-    if columns_zero_order_hold is not None:
-        m[columns_zero_order_hold] = m[columns_zero_order_hold].fillna(
-            method="ffill"
-        )
+    if topics_zero_order_hold is not None:
+
+        for t in topics_zero_order_hold:
+            msg = 'T_'+ t + '*'
+            m[list(m.filter(regex=msg).columns)] = m[list(m.filter(regex=msg).columns)].fillna(method='ffill')
 
     # apply interpolation to the whole dataframe (only NaN values get interpolated,
     # thus the zero order hold values from before do not get overwritten)

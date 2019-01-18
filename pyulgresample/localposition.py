@@ -36,7 +36,7 @@ class dfUlgPosition(dfUlg.dfUlgBase):
     def get_required_zoh_topics(cls):
         """
         Returns:
-            List of messages on which zoh is applied
+            List of topics on which zoh is applied
         """
         return []
 
