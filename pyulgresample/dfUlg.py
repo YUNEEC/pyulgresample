@@ -93,7 +93,7 @@ class dfUlgBase(metaclass=ABCMeta):
         if ulog is None:
             raise Exception("Ulog is empty")
 
-        pandadict = conv.createPandaDict(ulog)
+        pandadict = conv.createPandaDict(ulog, cls.get_nan_topic_msgs())
         df = conv.merge(pandadict, zoh, cls.get_nan_topic_msgs())
         # change to seconds
         df.timestamp = (df.timestamp - df.timestamp[0]) * 1e-6

@@ -5,9 +5,10 @@ Convert ulog file to different data structure
 import pyulog
 import pandas as pd
 import re
+import numpy as np
 
 
-def createPandaDict(ULog):
+def createPandaDict(ULog, nan_topic_msgs=None):
     """
     Convert ulog to dictionary of topic based panda-dataframes.
     rename topic-name such that each topic starts with `T_` and ends with instance ID.
@@ -30,6 +31,13 @@ def createPandaDict(ULog):
             col_rename_pattern.sub(lambda x: col_rename[x.group()], col)
             for col in msg_data.columns
         ]
+
+        if nan_topic_msgs:
+            for nant in nan_topic_msgs:
+                if nant.topic == msg.name:
+                    for m in nant.msgs:
+                        msg_data.loc[np.isnan(msg_data[m]), m] = np.inf
+
         ncol = {}
         for col in msg_data.columns:
             if col == "timestamp":
@@ -97,7 +105,6 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
                 for msg in t_nan.msgs:
                     regex = "{0}({1})".format(regex, msg)
                 regex = regex + "]"
-
             m[list(m.filter(regex=regex).columns)] = m[
                 list(m.filter(regex=regex).columns)
             ].fillna(method="ffill")
@@ -117,7 +124,9 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
 
     # drop all values that are still NaN
     m.dropna()
-
+    # replace the inf-values with NAN. Note: compare to the dropped NAN-values, the inf-values
+    # were originally NAN-values that were logged as part of the message
+    m.replace(np.inf, np.nan, inplace=True)
     return m
 
 
