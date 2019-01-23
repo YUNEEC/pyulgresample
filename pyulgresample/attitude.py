@@ -1,3 +1,10 @@
+"""Create dataframe with messages required to run attitude tests.
+
+Store topics required for attitude tests. 
+Add missing messages to the dataframe which are required for attitude tests. 
+
+"""
+
 import pandas as pd
 import numpy as np
 import argparse
@@ -20,36 +27,35 @@ parser.add_argument("filename", metavar="file.ulg", help="ulog file")
 
 
 class dfUlgAttitude(dfUlg.dfUlgBase):
-    """
-    dfUlgBase-Childclass for attitude and attitude-septoint topic
+    """dfUlgBase-Childclass for attitude and attitude-septoint topic.
+    
+    * Stores required topics and messages, 
+    * computes new messages and adds them to the dataframe.
+
     """
 
     @classmethod
     def get_required_topics(self):
-        """
-        Returns:
-            List of required topics
-        """
+        """Return a list with the required topics."""
         return ["vehicle_attitude", "vehicle_attitude_setpoint"]
 
     @classmethod
     def get_required_zoh_topics(self):
-        """
-        Returns:
-            List of topics on which zoh is applied
-        """
+        """Return a list of topics for which zero order hold is applied."""
         return []
 
     @classmethod
     def get_nan_topic_msgs(self):
-        """
-        Returns:
-            list of TopicMsgs
-        """
+        """Return a list of TopicMsgs."""
         return []
 
 
 def add_roll_pitch_yaw(df):
+    """Compute roll, pitch and yaw angle and add them to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     roll, pitch, yaw = mpd.series_quat2euler(
         df["T_vehicle_attitude_0__F_q_0"],
         df["T_vehicle_attitude_0__F_q_1"],
@@ -62,6 +68,11 @@ def add_roll_pitch_yaw(df):
 
 
 def add_euler_error(df):
+    """Compute orientation error as euler angles and add them to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     df["T_vehicle_attitude_setpoint_0__NF_e_roll"] = mpd.angle_wrap(
         df["T_vehicle_attitude_setpoint_0__F_roll_body"]
         - df["T_vehicle_attitude_0__NF_roll"]
@@ -77,6 +88,11 @@ def add_euler_error(df):
 
 
 def add_vehicle_z_axis(df):
+    """Compute the body z axis in world coordinate system and add it to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     x = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
@@ -108,7 +124,11 @@ def add_vehicle_z_axis(df):
 
 
 def add_desired_tilt(df):
-
+    """Compute desired tilt angle and add it to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     if "T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_x" not in df:
         add_desired_z_axis(df)
 
@@ -134,7 +154,11 @@ def add_desired_tilt(df):
 
 
 def add_tilt(df):
-
+    """Compute tilt angle and add it to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     if "T_vehicle_attitude_0__NF_body_z_axis_x" not in df:
         add_vehicle_z_axis(df)
 
@@ -160,7 +184,11 @@ def add_tilt(df):
 
 
 def add_vehicle_inverted(df):
-
+    """Check if the vehicle is tilted more than 90 degrees and add that information to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     if "T_vehicle_attitude_0__NF_body_z_axis_z" not in df:
         add_vehicle_z_axis(df)
 
@@ -172,6 +200,11 @@ def add_vehicle_inverted(df):
 
 
 def add_desired_z_axis(df):
+    """Compute the desired body z axis in world coordinate system and add it to the dataframe.
+    
+    Keyword arguments:
+    df -- dataframe containing messages from the required topics
+    """
     x = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
