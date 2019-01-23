@@ -4,7 +4,6 @@ Store topics required for attitude tests.
 Add missing messages to the dataframe which are required for attitude tests. 
 
 """
-
 import pandas as pd
 import numpy as np
 import argparse
@@ -29,8 +28,11 @@ parser.add_argument("filename", metavar="file.ulg", help="ulog file")
 class dfUlgAttitude(dfUlg.dfUlgBase):
     """dfUlgBase-Childclass for attitude and attitude-septoint topic.
     
-    * Stores required topics and messages, 
-    * computes new messages and adds them to the dataframe.
+    Store required topics and messages, 
+    compute new messages and adds them to the dataframe.
+
+    Arguments:
+    dfUlg.dfUlgBase -- Parentclass
 
     """
 
@@ -46,15 +48,16 @@ class dfUlgAttitude(dfUlg.dfUlgBase):
 
     @classmethod
     def get_nan_topic_msgs(self):
-        """Return a list of TopicMsgs."""
+        """Return a list of TopicMsgs wich are nan."""
         return []
 
 
 def add_roll_pitch_yaw(df):
     """Compute roll, pitch and yaw angle and add them to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+    
     """
     roll, pitch, yaw = mpd.series_quat2euler(
         df["T_vehicle_attitude_0__F_q_0"],
@@ -70,8 +73,9 @@ def add_roll_pitch_yaw(df):
 def add_euler_error(df):
     """Compute orientation error as euler angles and add them to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     df["T_vehicle_attitude_setpoint_0__NF_e_roll"] = mpd.angle_wrap(
         df["T_vehicle_attitude_setpoint_0__F_roll_body"]
@@ -90,8 +94,9 @@ def add_euler_error(df):
 def add_vehicle_z_axis(df):
     """Compute the body z axis in world coordinate system and add it to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     x = pd.Series(
         np.zeros(df.shape[0]),
@@ -126,8 +131,9 @@ def add_vehicle_z_axis(df):
 def add_desired_tilt(df):
     """Compute desired tilt angle and add it to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     if "T_vehicle_attitude_setpoint_0__NF_body_z_axis_sp_x" not in df:
         add_desired_z_axis(df)
@@ -156,8 +162,9 @@ def add_desired_tilt(df):
 def add_tilt(df):
     """Compute tilt angle and add it to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     if "T_vehicle_attitude_0__NF_body_z_axis_x" not in df:
         add_vehicle_z_axis(df)
@@ -186,8 +193,9 @@ def add_tilt(df):
 def add_vehicle_inverted(df):
     """Check if the vehicle is tilted more than 90 degrees and add that information to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     if "T_vehicle_attitude_0__NF_body_z_axis_z" not in df:
         add_vehicle_z_axis(df)
@@ -202,8 +210,9 @@ def add_vehicle_inverted(df):
 def add_desired_z_axis(df):
     """Compute the desired body z axis in world coordinate system and add it to the dataframe.
     
-    Keyword arguments:
+    Arguments:
     df -- dataframe containing messages from the required topics
+
     """
     x = pd.Series(
         np.zeros(df.shape[0]),
@@ -236,6 +245,7 @@ def add_desired_z_axis(df):
 
 
 def main():
+    """Call methods and create pdf with plots showing relevant data."""
     args = parser.parse_args()
     # create dataframe-ulog class for Attitude/Attiutde-setpoint topic
     att = dfUlgAttitude.create(args.filename)
