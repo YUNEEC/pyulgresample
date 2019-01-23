@@ -1,7 +1,4 @@
-"""
-Convert ulog file to different data structure
-"""
-
+"""Convert ulog file to different data structure."""
 import pyulog
 import pandas as pd
 import re
@@ -9,15 +6,21 @@ import numpy as np
 
 
 def createPandaDict(ULog, nan_topic_msgs=None):
-    """
-    Convert ulog to dictionary of topic based panda-dataframes.
+    """Convert ulog to dictionary of topic based panda-dataframes.
+
     rename topic-name such that each topic starts with `T_` and ends with instance ID.
-        i.e. vehicle_local_position and instance 0 -> T_vehicle_local_position_0
+    i.e. vehicle_local_position and instance 0 -> T_vehicle_local_position_0
     rename topic-fields such that vector indicices are replaced with underline and each field stars
     with letter F for denoting fields
-        i.e.: fieldmsg[0] -> F_fieldmsg_0; fieldmsg[1] -> F_fieldmsg_1
-    """
+    i.e.: fieldmsg[0] -> F_fieldmsg_0; fieldmsg[1] -> F_fieldmsg_1
 
+    Arguments:
+    ULog -- ulog file from which the dataframe should be created
+    
+    Keyword arguments:
+    nan_topic_msgs -- messages which contain nan values (default None)
+
+    """
     # column replacment
     col_rename = {"[": "_", "]": "", ".": "_"}
     col_rename_pattern = re.compile(
@@ -54,11 +57,15 @@ def createPandaDict(ULog, nan_topic_msgs=None):
 
 
 def merge_asof(pandadict, on=None, direction=None):
-    """
-    uses pandadit merge_asof
+    """use pandadict merge_asof to merge data.
+
+    Arguments:
     @params pandadict: dictionary of panda-dataframes
-    @params on: Topic that defines timestamp
-    @params direction: see pandas merge_asof
+
+    Keyword arguments:
+    @params on: Topic that defines timestamp (default None)
+    @params direction: see pandas merge_asof (default None)
+
     """
     if on is None:
         raise IOError("Must pass a topic name to merg on")
@@ -74,15 +81,18 @@ def merge_asof(pandadict, on=None, direction=None):
 
 
 def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
-    """
-    pandas merge method applied to pandadict
+    """Use pandas merge method applied to pandadict.
+
+    Arguments:
     @params pandadict: a dictionary of pandas dataframe
+
+    Keyword arguments:
     @params topics_zero_order_hold: by default merge will use linear interpolation
     @params nan_topic_msgs: list of TopicMsgs where the msgs contain NAN values
             interpolation. column_zero_order_hold specifies which messages
-            of pandadict are interpolated with zero-order-hold method.
-    """
+            of pandadict are interpolated with zero-order-hold method
 
+    """
     combineTopicFieldName(pandadict)
     skip = True
     for topic in pandadict:
@@ -131,8 +141,11 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
 
 
 def combineTopicFieldName(pandadict):
-    """
-    Adds topic name to field-name except for timestamp field
+    """Add topic name to field-name except for timestamp field.
+
+    Arguments:
+    pandadict -- a dictionary of pandas dataframe
+
     """
     for topic in pandadict.keys():
         ncol = {}

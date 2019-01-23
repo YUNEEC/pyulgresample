@@ -1,3 +1,9 @@
+"""Create dataframe with messages required to run local position tests.
+
+Store topics required for local position tests. 
+Add missing messages to the dataframe which are required for local position tests. 
+
+"""
 import pandas as pd
 import numpy as np
 import argparse
@@ -20,38 +26,47 @@ parser.add_argument("filename", metavar="file.ulg", help="ulog file")
 
 
 class dfUlgPosition(dfUlg.dfUlgBase):
-    """
-    dfUlgBase-Childclass for position and position-septoint topic
+    """dfUlgBase-Childclass for local position- and setpoint-topics.
+
+    Store required topics and messages, 
+    compute new messages and add them to the dataframe.
+
+    Arguments:
+    dfUlg.dfUlgBase -- Parentclass
+
     """
 
     @classmethod
     def get_required_topics(cls):
-        """
-        Returns:
-            List of required topics
-        """
+        """Return a list with the required topics."""
         return ["vehicle_local_position", "vehicle_local_position_setpoint"]
 
     @classmethod
     def get_required_zoh_topics(cls):
-        """
-        Returns:
-            List of topics on which zoh is applied
-        """
+        """Return a list of topics for which zero order hold is applied."""
         return []
 
     @classmethod
     def get_nan_topic_msgs(self):
-        """
-        Returns:
-            list of TopicMsgs
-        """
+        """Return a list of TopicMsgs wich are nan."""
         return [
             dfUlg.TopicMsgs("vehicle_local_position_setpoint", ["x", "y", "z"])
         ]
 
 
 def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
+    """Create a plot in a pdf with the information passed as arguments.
+    
+    Arguments:
+    df -- dataframe containing messages from the required topics
+    pdf -- pdf file
+    topic_1 -- name of one of the messages whose data will be plotted
+    topic_2 -- name of one of the messages whose data will be plotted
+    title -- title of the plot
+    y_label -- label for the y axis
+    iterator -- number of the plot in the pdf
+
+    """
     # desired and measured x position
     plt.figure(iterator, figsize=(20, 13))
     df_tmp = df[["timestamp", topic_1, topic_2]].copy()
@@ -64,6 +79,12 @@ def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
 
 
 def add_horizontal_distance(df):
+    """Compute the horizontal distance between the aircraft and the home point.
+                
+    Arguments:
+    df -- dataframe containing messages from the required topics
+    
+    """
     abs_horizontal_dist = pd.Series(
         np.zeros(df.shape[0]),
         index=df["timestamp"],
@@ -80,6 +101,7 @@ def add_horizontal_distance(df):
 
 
 def main():
+    """Call methods and create pdf with plots showing relevant data."""
     args = parser.parse_args()
     # create dataframe-ulog class for Position/Position-setpoint topic
     pos = dfUlgPosition.create(args.filename)

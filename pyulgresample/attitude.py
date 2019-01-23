@@ -29,7 +29,7 @@ class dfUlgAttitude(dfUlg.dfUlgBase):
     """dfUlgBase-Childclass for attitude and attitude-septoint topic.
     
     Store required topics and messages, 
-    compute new messages and adds them to the dataframe.
+    compute new messages and add them to the dataframe.
 
     Arguments:
     dfUlg.dfUlgBase -- Parentclass
