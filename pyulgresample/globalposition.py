@@ -239,7 +239,7 @@ def main():
                 d["T_vehicle_status_0__F_nav_state"][0]
                 == auto_state_group_number
             ):
-                ## global path with setpoint in UTM
+                # global path with setpoint in UTM
                 plt.figure(figure_number, figsize=(20, 13))
                 df_tmp = d[
                     [
@@ -301,7 +301,7 @@ def main():
 
                 figure_number = figure_number + 1
 
-        ## easting and northing setpoints and state
+        # easting and northing setpoints and state
         plt.figure(figure_number, figsize=(20, 13))
         df_tmp = posg.df[
             [
