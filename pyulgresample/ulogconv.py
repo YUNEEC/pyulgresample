@@ -21,7 +21,7 @@ def createPandaDict(ULog, nan_topic_msgs=None):
     nan_topic_msgs -- messages which contain nan values (default None)
 
     """
-    # column replacment
+    # column replacement
     col_rename = {"[": "_", "]": "", ".": "_"}
     col_rename_pattern = re.compile(
         r"(" + "|".join([re.escape(key) for key in col_rename.keys()]) + r")"
@@ -134,6 +134,7 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
 
     # drop all values that are still NaN
     m.dropna()
+    
     # replace the inf-values with NAN. Note: compare to the dropped NAN-values, the inf-values
     # were originally NAN-values that were logged as part of the message
     m.replace(np.inf, np.nan, inplace=True)
