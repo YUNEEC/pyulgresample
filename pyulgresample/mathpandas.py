@@ -31,7 +31,7 @@ def series_quat2euler(q0, q1, q2, q3, msg_name=""):
 
 def angle_wrap(x):
     """wrap angle between -pi and pi.
-    
+
     Arguments:
     x -- angle to be wrapped
 
@@ -68,7 +68,7 @@ def series_quatrot(x, y, z, q0, q1, q2, q3, rot_name=""):
 
 def series_quatrot_inverse(x, y, z, q0, q1, q2, q3, rot_name=""):
     """Given pandas series x-z and quaternion q0-q4, compute reversed rotated vector x_r, y_r, z_r.
-    
+
     Arguments:
     x,y,z -- vector to be rotated
     q0-q4 -- quaternion entries. The vector is being rotated with the inverse of that quaternion
@@ -86,7 +86,7 @@ def series_dot(x0, y0, z0, x1, y1, z1, dotname=""):
     Arguments:
     x0, y0, z0 -- first vector
     x1, y1, z1 -- second vector
-    
+
     Keyword Arguments:
     dotname -- name of the newly created data (default "")
 
@@ -106,7 +106,7 @@ def series_pythagoras(x0, y0, dotname=""):
     Arguments:
     x0 -- first pandas series
     y0 -- second pandas series
-    
+
     Keyword Arguments:
     dotname -- name of the newly created data (default "")
     """
@@ -122,7 +122,7 @@ def series_UTM(lat, lon, msg_name=""):
     Arguments:
     lat -- latitude
     lon -- longitude
-    
+
     Keyword Arguments:
     msg_name -- name of the newly created data (default "")
 
