@@ -39,12 +39,14 @@ class dfUlgBase(metaclass=ABCMeta):
     """
 
     def __init__(self, df, ulog, topics):
-        """Initialization
+        """Initialization.
 
         Arguments:
         df -- pandas dataframe with uORB msgs from topics
         ulog -- pyulog struct of uORB msgs (without resampling)
-        topics -- list of topics that are used to generate df and ulog"""
+        topics -- list of topics that are used to generate df and ulog
+
+        """
         self.df = df  # pandas dataframe
         self.ulog = ulog  # ulog
         self.topics = topics  # PX4-uorb topics
