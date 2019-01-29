@@ -7,3 +7,5 @@ sys.path.insert(
 )
 
 from pyulgresample import ulogconv
+from pyulgresample.dfUlg import dfUlgBase
+from pyulgresample import mathpandas
