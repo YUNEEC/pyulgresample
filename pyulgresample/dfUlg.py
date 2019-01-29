@@ -70,7 +70,7 @@ class dfUlgBase(metaclass=ABCMeta):
     def create(
         cls, filepath, additional_topics=None, additional_zoh_topics=None
     ):
-        """Factory method. Create a dfulgBase object.
+        """Factory method. Create a dfulgBase object
 
         By default, the merge-method uses linear interpolation for resampling.
         Dataframe (df) is a pandas-dataframe with index equal to the merged timestamps. Each column represents a message-field.
