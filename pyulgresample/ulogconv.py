@@ -16,7 +16,7 @@ def createPandaDict(ULog, nan_topic_msgs=None):
 
     Arguments:
     ULog -- ulog file from which the dataframe should be created
-    
+
     Keyword arguments:
     nan_topic_msgs -- messages which contain nan values (default None)
 
@@ -56,28 +56,30 @@ def createPandaDict(ULog, nan_topic_msgs=None):
     return pandadict
 
 
-def merge_asof(pandadict, on=None, direction=None):
-    """use pandadict merge_asof to merge data.
+# Currently not used
+#
+# def merge_asof(pandadict, on=None, direction=None):
+#     """use pandadict merge_asof to merge data.
 
-    Arguments:
-    @params pandadict: dictionary of panda-dataframes
+#     Arguments:
+#     @params pandadict: dictionary of panda-dataframes
 
-    Keyword arguments:
-    @params on: Topic that defines timestamp (default None)
-    @params direction: see pandas merge_asof (default None)
+#     Keyword arguments:
+#     @params on: Topic that defines timestamp (default None)
+#     @params direction: see pandas merge_asof (default None)
 
-    """
-    if on is None:
-        raise IOError("Must pass a topic name to merg on")
-    if direction is None:
-        direction = "backwards"
+#     """
+#     if on is None:
+#         raise IOError("Must pass a topic name to merg on")
+#     if direction is None:
+#         direction = "backwards"
 
-    combineTopicFieldName(pandadict)
-    m = pd.DataFrame(data=pandadict[on].timestamp, columns=["timestamp"])
-    for topic in pandadict:
-        m = pd.merge_asof(m, pandadict[topic], on="timestamp")
-    m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
-    return m
+#     combineTopicFieldName(pandadict)
+#     m = pd.DataFrame(data=pandadict[on].timestamp, columns=["timestamp"])
+#     for topic in pandadict:
+#         m = pd.merge_asof(m, pandadict[topic], on="timestamp")
+#     m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
+#     return m
 
 
 def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
@@ -134,7 +136,7 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
 
     # drop all values that are still NaN
     m.dropna()
-    
+
     # replace the inf-values with NAN. Note: compare to the dropped NAN-values, the inf-values
     # were originally NAN-values that were logged as part of the message
     m.replace(np.inf, np.nan, inplace=True)
