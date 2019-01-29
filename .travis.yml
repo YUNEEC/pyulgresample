@@ -4,7 +4,8 @@ python:
 
 install:
   - pip install flit
-  - flit install 
+  - flit install
 
 script:
   - pytest
+  - .travis/check_style.sh
