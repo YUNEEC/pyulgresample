@@ -7,13 +7,13 @@ import datetime
 def get_ulog(filepath, topics):
     """Read a .ulg file from the given filepath and return it as a ulog structure.
 
-    It can be that sometimes, topics are missing. 
-    Thus, check if the required topic are available in the ulog file. 
+    It can be that sometimes, topics are missing.
+    Thus, check if the required topic are available in the ulog file.
 
     Arguments:
     filepath -- absoulte path to the .ulg file
     topics -- list of required topics
-    
+
     """
     ulog = pyulog.ULog(filepath, topics)
 
@@ -42,7 +42,7 @@ def get_ulog(filepath, topics):
 
 def get_starttime(ulog):
     """Recover the start time stored in the ulog structure.
-    
+
     Arguments:
     ulog -- messages stored in ulog structure
 
@@ -54,7 +54,7 @@ def get_starttime(ulog):
 
 def get_duration(ulog):
     """Compute the duration for which data was logged.
-    
+
     Arguments:
     ulog -- messages stored in ulog structure
 
@@ -68,7 +68,7 @@ def get_duration(ulog):
 
 def get_date(ulog):
     """Recover the date at which the .ulg file has been created.
-    
+
     Arguments:
     ulog -- messages stored in ulog structure
 
@@ -85,7 +85,7 @@ def get_date(ulog):
 
 def get_param(ulog, parameter_name, default):
     """Recover a parameter from the ulog structure.
-    
+
     Arguments:
     ulog -- messages stored in ulog structure
     parameter_name -- name of the parameter that should be recovered
@@ -102,7 +102,7 @@ def add_param(ulog, parameter_name, dataframe):
     """add a parameter from the ulog structure to the dataframe.
 
     If parameters have changed, update them in the dataframe.
-    
+
     Arguments:
     ulog -- messages stored in ulog structure
     parameter_name -- name of the parameter that should be recovered

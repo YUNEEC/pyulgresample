@@ -1,7 +1,7 @@
 """Create dataframe with messages required to run global position tests.
 
-Store topics required for global position tests. 
-Add missing messages to the dataframe which are required for global position tests. 
+Store topics required for global position tests.
+Add missing messages to the dataframe which are required for global position tests.
 
 """
 import pandas as pd
@@ -30,7 +30,7 @@ parser.add_argument("filename", metavar="file.ulg", help="ulog file")
 class dfUlgPositionGlobal(dfUlg.dfUlgBase):
     """dfUlgBase-Childclass for global position- and setpoint-topics.
 
-    Store required topics and messages, 
+    Store required topics and messages,
     compute new messages and add them to the dataframe.
 
     Arguments:
@@ -61,10 +61,10 @@ class dfUlgPositionGlobal(dfUlg.dfUlgBase):
 
 def apply_UTM_constraints(df):
     """Only keep entries that fulfill UTM constraints.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     # only consider dataframe where global reference is provided
     # xy_global is True if xy_global == 1, False if xy_global == 0
@@ -103,10 +103,10 @@ def apply_UTM_constraints(df):
 
 def add_UTM_from_global_target_setpoin(df):
     """Convert data from global target setpoint to UTM and add that to the dataframe.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     easting, northing, zone = mpd.series_UTM(
         df["T_position_setpoint_triplet_0__F_current_lat"],
@@ -120,10 +120,10 @@ def add_UTM_from_global_target_setpoin(df):
 
 def add_UTM_from_reference(df):
     """Convert data from reference to UTM and add that to the dataframe.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     easting, northing, zone = mpd.series_UTM(
         df["T_vehicle_local_position_0__F_ref_lat"],
@@ -137,10 +137,10 @@ def add_UTM_from_reference(df):
 
 def add_UTM_setpoint_relative_to_reference(df):
     """Add missing easting messages to dataframe, absolute and relative.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     if "T_position_setpoint_triplet_0__NF_current_easting" not in df:
         add_UTM_from_global_target_setpoin(df)
@@ -160,10 +160,10 @@ def add_UTM_setpoint_relative_to_reference(df):
 
 def add_UTM_from_global_position(df):
     """Convert data from global position to UTM and add that to the dataframe.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     easting, northing, zone = mpd.series_UTM(
         df["T_vehicle_global_position_0__F_lat"],
@@ -178,10 +178,10 @@ def add_UTM_from_global_position(df):
 
 def add_UTM_position_relative_to_reference(df):
     """Add missing easting data and global position relative easting data.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     if "T_vehicle_global_position_0__NF_easting" not in df:
         add_UTM_from_global_position(df)

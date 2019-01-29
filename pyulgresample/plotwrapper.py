@@ -4,7 +4,7 @@ import numpy as np
 
 def plot_time_series(df, plt):
     """Plot a time series.
-    
+
     Arguments:
     df -- dataframe containing messages from the required topics
     plt -- plot

@@ -1,7 +1,7 @@
 """Create dataframe with messages required to run local position tests.
 
-Store topics required for local position tests. 
-Add missing messages to the dataframe which are required for local position tests. 
+Store topics required for local position tests.
+Add missing messages to the dataframe which are required for local position tests.
 
 """
 import pandas as pd
@@ -28,7 +28,7 @@ parser.add_argument("filename", metavar="file.ulg", help="ulog file")
 class dfUlgPosition(dfUlg.dfUlgBase):
     """dfUlgBase-Childclass for local position- and setpoint-topics.
 
-    Store required topics and messages, 
+    Store required topics and messages,
     compute new messages and add them to the dataframe.
 
     Arguments:
@@ -56,7 +56,7 @@ class dfUlgPosition(dfUlg.dfUlgBase):
 
 def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
     """Create a plot in a pdf with the information passed as arguments.
-    
+
     Arguments:
     df -- dataframe containing messages from the required topics
     pdf -- pdf file
@@ -80,10 +80,10 @@ def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
 
 def add_horizontal_distance(df):
     """Compute the horizontal distance between the aircraft and the home point.
-                
+
     Arguments:
     df -- dataframe containing messages from the required topics
-    
+
     """
     abs_horizontal_dist = pd.Series(
         np.zeros(df.shape[0]),

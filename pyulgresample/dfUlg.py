@@ -1,7 +1,7 @@
 """Create dataframe from .ulg file and convert it to other structures.
 
-Read required topics. 
-Create ulog structure from .ulg file. 
+Read required topics.
+Create ulog structure from .ulg file.
 Create pandas dataframe
 
 """
@@ -16,7 +16,7 @@ class TopicMsgs:
 
     def __init__(self, topic, msgs):
         """Initialization.
-        
+
         Arguments:
         topic -- topic that is used to generate df and ulog
         msgs -- messages from that topics
@@ -30,7 +30,7 @@ class dfUlgBase(metaclass=ABCMeta):
     """Base class, converts .ulg file into ulog-structure and pandas-dataframe.
 
     Check .ulg file.
-    Read required topics. 
+    Read required topics.
     Create new data structures.
 
     Keyword arguments:
@@ -40,9 +40,9 @@ class dfUlgBase(metaclass=ABCMeta):
 
     def __init__(self, df, ulog, topics):
         """Initialization.
-        
+
         Arguments:
-        df -- pandas dataframe with uORB msgs from topics 
+        df -- pandas dataframe with uORB msgs from topics
         ulog -- pyulog struct of uORB msgs (without resampling)
         topics -- list of topics that are used to generate df and ulog
 
