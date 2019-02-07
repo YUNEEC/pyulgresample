@@ -18,7 +18,7 @@ def get_ulog(filepath, topics=None):
     """
     ulog = pyulog.ULog(filepath)
 
-    if not topics:
+    if topics:
         ulog = pyulog.ULog(filepath, topics)
 
         tmp = topics.copy()
