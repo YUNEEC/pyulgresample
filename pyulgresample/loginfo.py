@@ -2,10 +2,11 @@
 import pyulog
 import numpy as np
 import datetime
+import warnings
 
 
-def get_ulog(filepath, topics):
-    """Read a .ulg file from the given filepath and return it as a ulog structure.
+def get_ulog(filepath, topics=None):
+    """Read a ulg file from the given filepath and return it as a ulog structure.
 
     It can be that sometimes, topics are missing.
     Thus, check if the required topic are available in the ulog file.
@@ -15,29 +16,34 @@ def get_ulog(filepath, topics):
     topics -- list of required topics
 
     """
-    ulog = pyulog.ULog(filepath, topics)
+    ulog = pyulog.ULog(filepath)
+
+    if not topics:
+        ulog = pyulog.ULog(filepath, topics)
+
+        tmp = topics.copy()
+
+        for topic in ulog.data_list:
+            if topic.name in tmp:
+                idx = tmp.index(topic.name)
+                tmp.pop(idx)
+
+        if len(tmp) > 0:
+            warnings.warn(
+                "The following topics do not exist: \n {0}".format(tmp)
+            )
 
     if not ulog.data_list:
-        print("\033[93m" + "Not a single desired topic present" + "\033[0m")
-        return None
-
-    tmp = topics.copy()
-
-    for topic in ulog.data_list:
-        if topic.name in tmp:
-            idx = tmp.index(topic.name)
-            tmp.pop(idx)
-
-    if len(tmp) > 0:
-        print(
-            "\033[93m"
-            + "The following topics do not exist in the provided ulog file: "
-            + "\033[0m"
-        )
-        print(tmp)
-        return None
+        warnings.warn("No topics present.")
 
     return ulog
+
+
+def mu2hms(musecond):
+    """convert microsecond to hours:min:second (string)."""
+    m1, s1 = divmod(int(musecond / 1e6), 60)
+    h1, m1 = divmod(m1, 60)
+    return "{:d}:{:02d}:{:02d}".format(h1, m1, s1)
 
 
 def get_starttime(ulog):
@@ -47,9 +53,7 @@ def get_starttime(ulog):
     ulog -- messages stored in ulog structure
 
     """
-    m1, s1 = divmod(int(ulog.start_timestamp / 1e6), 60)
-    h1, m1 = divmod(m1, 60)
-    return "{:d}:{:02d}:{:02d}".format(h1, m1, s1)
+    return mu2hms(ulog.start_timestamp)
 
 
 def get_duration(ulog):
@@ -59,28 +63,7 @@ def get_duration(ulog):
     ulog -- messages stored in ulog structure
 
     """
-    m2, s2 = divmod(
-        int((ulog.last_timestamp - ulog.start_timestamp) / 1e6), 60
-    )
-    h2, m2 = divmod(m2, 60)
-    return "{:d}:{:02d}:{:02d}".format(h2, m2, s2)
-
-
-def get_date(ulog):
-    """Recover the date at which the .ulg file has been created.
-
-    Arguments:
-    ulog -- messages stored in ulog structure
-
-    """
-    gps_data = ulog.get_dataset("vehicle_gps_position")
-    indices = np.nonzero(gps_data.data["time_utc_usec"])
-    if len(indices[0]) > 0:
-        return datetime.datetime.fromtimestamp(
-            gps_data.data["time_utc_usec"][0] / 1000000
-        )
-    else:
-        return None
+    return mu2hms(ulog.last_timestamp - ulog.start_timestamp)
 
 
 def get_param(ulog, parameter_name, default):
@@ -98,7 +81,7 @@ def get_param(ulog, parameter_name, default):
         return default
 
 
-def add_param(ulog, parameter_name, dataframe):
+def add_param(dfUlg, parameter_name):
     """add a parameter from the ulog structure to the dataframe.
 
     If parameters have changed, update them in the dataframe.
@@ -109,8 +92,18 @@ def add_param(ulog, parameter_name, dataframe):
     dataframe -- pandas dataframe which contains all messages of the required topics
 
     """
-    dataframe["parameter_name"] = get_param(ulog, parameter_name, 0)
-    if len(ulog.changed_parameters) > 0:
-        for time, name, value in ulog.changed_parameters:
+    dfUlg.df[parameter_name] = get_param(dfUlg.ulog, parameter_name, 0)
+
+    if len(dfUlg.ulog.changed_parameters) > 0 and (
+        parameter_name in [x[1] for x in dfUlg.ulog.changed_parameters]
+    ):
+        dfUlg.df[parameter_name] = np.nan
+        for time, name, value in dfUlg.ulog.changed_parameters:
             if name == parameter_name:
-                dataframe[dataframe[parameter_name]]
+                dfUlg.df.loc[
+                    (dfUlg.df.timestamp <= time)
+                    & (np.isnan(dfUlg.df[parameter_name])),
+                    parameter_name,
+                ] = value
+
+        dfUlg.df[parameter_name].fillna(method="ffill", inplace=True)
