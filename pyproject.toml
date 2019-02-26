@@ -7,7 +7,7 @@ module = "pyulgresample"
 author = "Dennis Mannhart"
 author-email = "dennis@yuneecresearch.com"
 home-page = "https://github.com/YUNEEC/pyulgresample"
-requires=[        
+requires=[
         "matplotlib (>= 3.0.0)",
         "numpy (>= 1.15.3)",
         "pandas (>= 0.23.4)",
@@ -33,11 +33,6 @@ requires = [
 test = [
     "pytest"
 ]
-
-[tool.flit.scripts]
-px4_attitude = "pyulgresample.attitude:main"
-px4_position = "pyulgresample.localposition:main"
-px4_position_global = "pyulgresample.globalposition:main"
 
 [tool.black]
 line-length = 79
