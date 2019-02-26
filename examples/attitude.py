@@ -244,7 +244,7 @@ def main():
         args.filename, topics=["vehicle_attitude", "vehicle_attitude_setpoint"]
     )
 
-    with PdfPages("px4_attitude.pdf") as pdf:
+    with PdfPages("attitude.pdf") as pdf:
 
         # roll pitch and yaw error
         add_roll_pitch_yaw(att.df)
@@ -305,7 +305,7 @@ def main():
         pdf.savefig()
         plt.close(2)
 
-        print("px4_attitude.pdf was created")
+        print("attitude.pdf was created")
 
 
 if __name__ == "__main__":
