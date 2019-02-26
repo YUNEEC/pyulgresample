@@ -1,34 +1,43 @@
 # pyulgresample
-Package that processes ulog-data from [pyulog](https://github.com/PX4/pyulog). It converts ulog-data into pandas dataframe through resampling and provides convenient functions to add and extract additional information from the ulog-data. 
-To convert a `.ulg` file into `ulog`, please follow [pyulog](https://github.com/PX4/pyulog).
-With the `ulogconv` module the `ulog` can then be farther processed into a panda dict:
-```bash
-pandadict = ulogconv.createPandaDict(ulog)
-```
-`pandaditct` is a python dictionaires where each key is a panda dataframe that corresponds to a `.ulg` message. 
+Package that processes ulog-data from [pyulog](https://github.com/PX4/pyulog). It converts ulog-data into pandas dataframe through resampling and provides convenient functions to add and extract additional information from the ulog-data.
+To convert a `.ulg` file into `ulog`, please follow the [pyulog](https://github.com/PX4/pyulog) instruction.
 
-To resample and merge all the dataframes of the `pandadict`:
-```bash
-dataframe = ulogconv.merge(pandadict)
-```
-By default, the  `merge`-method uses linear interpolation for resampling. 
-(Note: pandas merge-asof method is also supported)
+## modules
+### ulogdataframe
+`ulogdataframe` contains the following classes:
 
-`dataframe` is a pandas dataframe with index equal to the merged timestamps. Each column represents a message-field. 
+- TopicMsgs
+- DfUlg
+
+#### TopicMsgs
+This class is a convenient class to specify a specific topic with corresponding messages of interest.
+
+#### DfUlg
+This class contains a ulog-structure, pandas dataframe-structure and list of topics as class-members. It also contains a factory-method for converting a .ulg-file into class-members.
+
+#### ulogconv
+This module contains a few helper-functions for converting a .ulg-file into pandas-dataframe. It is mainly used by DfUlg.
+
+#### mathpandas
+Contains time-series functions.
+
+#### loginfo
+Functions that provide info about the ulg-file.
+
+
+`dataframe` is a pandas dataframe with index equal to the merged timestamps. Each column represents a message-field.
 For instance, the `thrust`-field of the message [vehicle_local_position_setpoint](https://github.com/PX4/Firmware/blob/master/msg/vehicle_local_position_setpoint.msg) message would be named as follow:
 
 > T_vehicle_local_position_setpoint_0__F_thrust_x
 
-if the field `x` of `vehicle_local_position_setpoint` is a scalar or 
+if the field `x` of `vehicle_local_position_setpoint` is a scalar or
 
 > T_vehicle_local_position_setpoint_0__F_x_0
 
-if the field `x` is an array, where the 0 represents the index of the array. 
+if the field `x` is an array, where the 0 represents the index of the array.
 
-The `T` stands for topic, which indicates the beginning of the topic. In this example, the topcic name is 
-`vehicle_local_position_setpoint`. The topic name is followed by a number, which indicates the topic instance. If there is only one instance of a specific topic, then this number will be `0`. The instance number is followed by two underlines and a capital letter `F`, which stands for field. In the example above, the field in question is `x`. 
-
-Informaiton can also be generated from the given `.ulg` data. If a new field is generated (for instance tilt-field can be generated from the attitude topic), then this new field message will have a `NF` instead of `F` to indicate the start of the field. 
+The `T` stands for topic, which indicates the beginning of the topic. In this example, the topcic name is
+`vehicle_local_position_setpoint`. The topic name is followed by a number, which indicates the topic instance. If there is only one instance of a specific topic, then this number will be `0`. The instance number is followed by two underlines and a capital letter `F`, which stands for field. In the example above, the field in question is `x`.
 
 ## installation
 To prevent any conflict with the system python version, it is suggested to use a virtual enrionment with python version 3.6 and higher. Otherwise, python 3.6 and higher must be the python system version.
@@ -100,7 +109,7 @@ system:
 pre-commit install
 ```
 
-To test if everything is setup correctly, you can run the `px4_attitude`-script, which creates a pdf with a few plots in it. Make sure that the path to the ulg-file exists. 
+To test if everything is setup correctly, you can run the `px4_attitude`-script, which creates a pdf with a few plots in it. Make sure that the path to the ulg-file exists.
 ```bash
 px4_attitude logs/cd6d8090-8c7f-41e5-bf62-3c95cc09fba1.ulg
 ```
