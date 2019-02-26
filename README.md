@@ -3,25 +3,26 @@ Package that processes ulog-data from [pyulog](https://github.com/PX4/pyulog). I
 To convert a `.ulg` file into `ulog`, please follow the [pyulog](https://github.com/PX4/pyulog) instruction.
 
 ## modules
+
 ### ulogdataframe
 `ulogdataframe` contains the following classes:
 
 - TopicMsgs
 - DfUlg
 
-#### TopicMsgs
+### TopicMsgs
 This class is a convenient class to specify a specific topic with corresponding messages of interest.
 
-#### DfUlg
+### DfUlg
 This class contains a ulog-structure, pandas dataframe-structure and list of topics as class-members. It also contains a factory-method for converting a .ulg-file into class-members.
 
-#### ulogconv
+### ulogconv
 This module contains a few helper-functions for converting a .ulg-file into pandas-dataframe. It is mainly used by DfUlg.
 
-#### mathpandas
+### mathpandas
 Contains time-series functions.
 
-#### loginfo
+### loginfo
 Functions that provide info about the ulg-file.
 
 
@@ -108,12 +109,6 @@ system:
 ```bash
 pre-commit install
 ```
-
-To test if everything is setup correctly, you can run the `px4_attitude`-script, which creates a pdf with a few plots in it. Make sure that the path to the ulg-file exists.
-```bash
-px4_attitude logs/cd6d8090-8c7f-41e5-bf62-3c95cc09fba1.ulg
-```
-
 
 
 
