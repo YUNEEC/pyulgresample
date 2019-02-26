@@ -16,8 +16,6 @@ def get_ulog(filepath, topics=None):
     topics -- list of required topics
 
     """
-    ulog = pyulog.ULog(filepath)
-
     if topics:
         ulog = pyulog.ULog(filepath, topics)
 
@@ -32,6 +30,8 @@ def get_ulog(filepath, topics=None):
             warnings.warn(
                 "The following topics do not exist: \n {0}".format(tmp)
             )
+    else:
+        ulog = pyulog.ULog(filepath)
 
     if not ulog.data_list:
         warnings.warn("No topics present.")
