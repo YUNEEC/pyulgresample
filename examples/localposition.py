@@ -11,7 +11,6 @@ import os
 import pyulog
 from pyulgresample import ulogconv as conv
 from pyulgresample import mathpandas as mpd
-from pyulgresample import plotwrapper as pltw
 from pyulgresample import loginfo
 from pyulgresample.ulogdataframe import DfUlg, TopicMsgs
 
@@ -103,7 +102,7 @@ def main():
         # ],
     )
 
-    with PdfPages("px4_position.pdf") as pdf:
+    with PdfPages("position.pdf") as pdf:
 
         add_horizontal_distance(pos.df)
 
@@ -141,18 +140,7 @@ def main():
             2,
         )
 
-        # horizontal distance to home
-        print_pdf(
-            pos.df,
-            pdf,
-            "T_vehicle_local_position_0__NF_abs_horizontal_dist",
-            "T_vehicle_local_position_0__NF_abs_horizontal_dist",
-            "absolute horizontal distance",
-            "meters",
-            3,
-        )
-
-        print("px4_position.pdf was created")
+        print("position.pdf was created")
 
 
 if __name__ == "__main__":
