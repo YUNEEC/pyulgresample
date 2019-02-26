@@ -75,7 +75,7 @@ def add_UTM_from_global_target_setpoin(df):
     df -- dataframe containing messages from the required topics
 
     """
-    easting, northing, zone = mpd.series_UTM(
+    easting, northing, zone = mpd.series_utm(
         df["T_position_setpoint_triplet_0__F_current_lat"],
         df["T_position_setpoint_triplet_0__F_current_lon"],
     )
@@ -92,7 +92,7 @@ def add_UTM_from_reference(df):
     df -- dataframe containing messages from the required topics
 
     """
-    easting, northing, zone = mpd.series_UTM(
+    easting, northing, zone = mpd.series_utm(
         df["T_vehicle_local_position_0__F_ref_lat"],
         df["T_vehicle_local_position_0__F_ref_lon"],
     )
@@ -132,7 +132,7 @@ def add_UTM_from_global_position(df):
     df -- dataframe containing messages from the required topics
 
     """
-    easting, northing, zone = mpd.series_UTM(
+    easting, northing, zone = mpd.series_utm(
         df["T_vehicle_global_position_0__F_lat"],
         df["T_vehicle_global_position_0__F_lon"],
     )

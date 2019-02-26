@@ -8,14 +8,14 @@ import numpy as np
 def create_pandadict(ULog):
     """Convert ulog to dictionary of topic based panda-dataframes.
 
-    rename topic-name such that each topic starts with `T_` and ends with instance ID.
+    Rename topic-name such that each topic starts with `T_` and ends with instance ID.
     i.e. vehicle_local_position and instance 0 -> T_vehicle_local_position_0
-    rename topic-fields such that vector indicices are replaced with underline and each field stars
+    rename topic-fields such that vector indicices are replaced with underline and each field starts
     with letter F for denoting fields
     i.e.: fieldmsg[0] -> F_fieldmsg_0; fieldmsg[1] -> F_fieldmsg_1
 
     Arguments:
-    ULog -- ulog file from which the dataframe should be created
+    ULog -- ulog object
 
     """
     # column replacement
@@ -52,7 +52,7 @@ def replace_nan_with_inf(ulog, topic_msgs_list):
 
     Arguments:
     pandadict -- a dictionary of pandas dataframe with keys equal to topics
-    topic_msgs_list -- list of topicMsgs on which zoh is going to be applied
+    topic_msgs_list -- list of topicMsgs on which zero-order-hold interpolation is used
 
     """
     for topic_msgs in topic_msgs_list:

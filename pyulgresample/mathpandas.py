@@ -116,7 +116,7 @@ def series_pythagoras(x0, y0, dotname=""):
     return pd.Series(name=dotname, data=pythagoras, index=x0.index)
 
 
-def series_UTM(lat, lon, msg_name=""):
+def series_utm(lat, lon, msg_name=""):
     """Given pandas series lat/lon in degrees, compute UTM easting/northing/zone).
 
     Arguments:

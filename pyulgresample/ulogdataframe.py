@@ -18,8 +18,8 @@ class TopicMsgs:
         """Initialization.
 
         Arguments:
-        topic -- topic that is used to generate df and ulog
-        msgs -- messages from that topics
+        topic -- topic that is used to generate dataframe and ulog
+        msgs -- list of messages from the corresponding topic
 
         """
         self.topic = topic
@@ -27,7 +27,7 @@ class TopicMsgs:
 
 
 class DfUlg:
-    """Base class, converts .ulg file into ulog-structure and pandas-dataframe.
+    """Class that contains ulog-structure and pandas-dataframe for a set of topics.
 
     Check .ulg file.
     Read required topics.
@@ -39,21 +39,21 @@ class DfUlg:
         """Initialization.
 
         Arguments:
-        df -- pandas dataframe with uORB msgs from topics
+        df -- pandas dataframe with uORB msgs from topics (resampled)
         ulog -- pyulog struct of uORB msgs (without resampling)
         topics -- list of topics that are used to generate df and ulog
 
         """
         self.df = df  # pandas dataframe
         self.ulog = ulog  # ulog
-        self.topics = topics  # PX4-uorb topics
+        self.topics = topics  # uorb topics
 
     @classmethod
     def _check_file(self, filepath):
         """Check if file is a .ulg file.
 
         Arguments:
-            filepat -- path to .ulg-file
+            filepath -- path to .ulg-file
 
         """
         if os.path.isfile(filepath):
@@ -71,7 +71,7 @@ class DfUlg:
         zoh_topic_msgs_list=None,
         nan_topic_msgs_list=None,
     ):
-        """Factory method. Create a dfulgBase object.
+        """Factory method. Create a DfUlg object.
 
         By default, the merge-method uses linear interpolation for resampling.
         Dataframe (df) is a pandas-dataframe with index equal to the merged timestamps. Each column represents a message-field.
@@ -89,7 +89,7 @@ class DfUlg:
 
         Keyword arguments:
         nan_topic_msgs_list -- list of TopicMsgs which contain Nan-values
-        zoh_topic_msgs_list -- list of TopicMsgs on which zoh has to be applied
+        zoh_topic_msgs_list -- list of TopicMsgs on which zero-order-hold interpolation is used
 
         """
         # check if valid file is provided
