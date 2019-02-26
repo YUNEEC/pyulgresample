@@ -5,7 +5,7 @@ import re
 import numpy as np
 
 
-def createPandaDict(ULog, nan_topic_msgs=None):
+def create_pandadict(ULog):
     """Convert ulog to dictionary of topic based panda-dataframes.
 
     rename topic-name such that each topic starts with `T_` and ends with instance ID.
@@ -16,9 +16,6 @@ def createPandaDict(ULog, nan_topic_msgs=None):
 
     Arguments:
     ULog -- ulog file from which the dataframe should be created
-
-    Keyword arguments:
-    nan_topic_msgs -- messages which contain nan values (default None)
 
     """
     # column replacement
@@ -35,12 +32,6 @@ def createPandaDict(ULog, nan_topic_msgs=None):
             for col in msg_data.columns
         ]
 
-        if nan_topic_msgs:
-            for nant in nan_topic_msgs:
-                if nant.topic == msg.name:
-                    for m in nant.msgs:
-                        msg_data.loc[np.isnan(msg_data[m]), m] = np.inf
-
         ncol = {}
         for col in msg_data.columns:
             if col == "timestamp":
@@ -56,46 +47,35 @@ def createPandaDict(ULog, nan_topic_msgs=None):
     return pandadict
 
 
-# Currently not used
-#
-# def merge_asof(pandadict, on=None, direction=None):
-#     """use pandadict merge_asof to merge data.
-
-#     Arguments:
-#     @params pandadict: dictionary of panda-dataframes
-
-#     Keyword arguments:
-#     @params on: Topic that defines timestamp (default None)
-#     @params direction: see pandas merge_asof (default None)
-
-#     """
-#     if on is None:
-#         raise IOError("Must pass a topic name to merg on")
-#     if direction is None:
-#         direction = "backwards"
-
-#     combineTopicFieldName(pandadict)
-#     m = pd.DataFrame(data=pandadict[on].timestamp, columns=["timestamp"])
-#     for topic in pandadict:
-#         m = pd.merge_asof(m, pandadict[topic], on="timestamp")
-#     m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
-#     return m
-
-
-def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
-    """Use pandas merge method applied to pandadict.
+def replace_nan_with_inf(ulog, topic_msgs_list):
+    """Replace nan-values with inf-values.
 
     Arguments:
-    @params pandadict: a dictionary of pandas dataframe
-
-    Keyword arguments:
-    @params topics_zero_order_hold: by default merge will use linear interpolation
-    @params nan_topic_msgs: list of TopicMsgs where the msgs contain NAN values
-            interpolation. column_zero_order_hold specifies which messages
-            of pandadict are interpolated with zero-order-hold method
+    pandadict -- a dictionary of pandas dataframe with keys equal to topics
+    topic_msgs_list -- list of topicMsgs on which zoh is going to be applied
 
     """
-    combineTopicFieldName(pandadict)
+    for topic_msgs in topic_msgs_list:
+        for ulogtopic in ulog.data_list:
+            if ulogtopic.name == topic_msgs.topic:
+                if topic_msgs.msgs:
+                    for msg in topic_msgs.msgs:
+                        nan_ind = np.isnan(ulogtopic.data[msg])
+                        ulogtopic.data[msg][nan_ind] = np.inf
+                else:
+                    for msg in ulogtopic.data.keys():
+                        nan_ind = np.isnan(ulogtopic.data[msg])
+                        ulogtopic.data[msg][nan_ind] = np.inf
+
+
+def merge_pandadict(pandadict):
+    """Merge all dataframes within dictionanry.
+
+    Arguments:
+    pandadict -- a dictionary of pandas dataframe
+
+    """
+    combine_topic_fieldname(pandadict)
     skip = True
     for topic in pandadict:
         if skip:
@@ -106,44 +86,29 @@ def merge(pandadict, topics_zero_order_hold=None, nan_topic_msgs=None):
                 m, pandadict[topic], on="timestamp", how="outer"
             )
     m.index = pd.TimedeltaIndex(m.timestamp * 1e3, unit="ns")
-
-    # apply zero order hold for topics that contain NAN
-    # TODO: handle NANs for linear interpolation
-    if nan_topic_msgs:
-        for t_nan in nan_topic_msgs:
-            regex = t_nan.topic + ".+"
-            if t_nan.msgs:
-                regex = regex + "["
-                for msg in t_nan.msgs:
-                    regex = "{0}({1})".format(regex, msg)
-                regex = regex + "]"
-            m[list(m.filter(regex=regex).columns)] = m[
-                list(m.filter(regex=regex).columns)
-            ].fillna(method="ffill")
-
-    # apply zero order hold for some selected topics
-    if topics_zero_order_hold is not None:
-
-        for t in topics_zero_order_hold:
-            msg = "T_" + t + "*"
-            m[list(m.filter(regex=msg).columns)] = m[
-                list(m.filter(regex=msg).columns)
-            ].fillna(method="ffill")
-
-    # apply interpolation to the whole dataframe (only NaN values get interpolated,
-    # thus the zero order hold values from before do not get overwritten)
-    m = m.interpolate(method="linear")
-
-    # drop all values that are still NaN
-    m.dropna()
-
-    # replace the inf-values with NAN. Note: compare to the dropped NAN-values, the inf-values
-    # were originally NAN-values that were logged as part of the message
-    m.replace(np.inf, np.nan, inplace=True)
     return m
 
 
-def combineTopicFieldName(pandadict):
+def apply_zoh(df, topic_msgs_list):
+    """Apply zero-order-hold to msgs.
+
+    Arguments:
+    df -- dataframe of all msgs
+    topic_msgs_list -- list of topicMsgs on which zoh is going to be applied
+    """
+    for topicMsgs in topic_msgs_list:
+        regex = topicMsgs.topic + ".+"
+        if topicMsgs.msgs:
+            regex = regex + "["
+            for msg in topicMsgs.msgs:
+                regex = "{0}({1})".format(regex, msg)
+            regex = regex + "]"
+        df[list(df.filter(regex=regex).columns)] = df[
+            list(df.filter(regex=regex).columns)
+        ].fillna(method="ffill")
+
+
+def combine_topic_fieldname(pandadict):
     """Add topic name to field-name except for timestamp field.
 
     Arguments:
