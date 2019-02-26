@@ -1,9 +1,9 @@
 """test_loginfo."""
 from context import loginfo
+from context import DfUlg
 import pytest
 import warnings
 from numpy.testing import assert_almost_equal
-from context import localposition
 
 
 def test_get_ulog_wrong_topic():
@@ -59,7 +59,10 @@ def test_ulog_getters():
 def test_add_parameter():
     """test add parameter to dataframe."""
     file = "testlogs/parameterchange.ulg"
-    lm = localposition.dfUlgPosition.create(file)
+    lm = DfUlg.create(
+        filepath=file,
+        topics=["vehicle_local_position", "vehicle_local_position_setpoint"],
+    )
 
     # we should have three different groups
     loginfo.add_param(lm, "MPC_YAW_MODE")
