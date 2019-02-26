@@ -11,9 +11,8 @@ import os
 import pyulog
 from pyulgresample import ulogconv as conv
 from pyulgresample import mathpandas as mpd
-from pyulgresample import plotwrapper as pltw
 from pyulgresample import loginfo
-from pyulgresample import dfUlg
+from pyulgresample.ulogdataframe import DfUlg, TopicMsgs
 
 import matplotlib
 
@@ -23,33 +22,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 parser = argparse.ArgumentParser(description="Script to process attitude")
 parser.add_argument("filename", metavar="file.ulg", help="ulog file")
-
-
-class dfUlgAttitude(dfUlg.dfUlgBase):
-    """dfUlgBase-Childclass for attitude and attitude-septoint topic.
-
-    Store required topics and messages,
-    compute new messages and add them to the dataframe.
-
-    Arguments:
-    dfUlg.dfUlgBase -- Parentclass
-
-    """
-
-    @classmethod
-    def get_required_topics(self):
-        """Return a list with the required topics."""
-        return ["vehicle_attitude", "vehicle_attitude_setpoint"]
-
-    @classmethod
-    def get_required_zoh_topics(self):
-        """Return a list of topics for which zero order hold is applied."""
-        return []
-
-    @classmethod
-    def get_nan_topic_msgs(self):
-        """Return a list of TopicMsgs wich are nan."""
-        return []
 
 
 def add_roll_pitch_yaw(df):
@@ -244,11 +216,33 @@ def add_desired_z_axis(df):
     df[z.name] = z.values
 
 
+def plot_time_series(df, plt):
+    """Plot a time series.
+
+    Arguments:
+    df -- dataframe containing messages from the required topics
+    plt -- plot
+
+    """
+    # Remove the plot frame lines
+    delta = (df["timestamp"].max() - df["timestamp"].min()) / 10
+    plt.xticks(
+        np.arange(
+            df["timestamp"].min(),
+            df["timestamp"].max(),
+            step=np.around(delta, decimals=1),
+        )
+    )
+    plt.grid()
+
+
 def main():
     """Call methods and create pdf with plots showing relevant data."""
     args = parser.parse_args()
     # create dataframe-ulog class for Attitude/Attiutde-setpoint topic
-    att = dfUlgAttitude.create(args.filename)
+    att = DfUlg.create(
+        args.filename, topics=["vehicle_attitude", "vehicle_attitude_setpoint"]
+    )
 
     with PdfPages("px4_attitude.pdf") as pdf:
 
@@ -266,7 +260,7 @@ def main():
             ]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
-        pltw.plot_time_series(df_tmp, plt)
+        plot_time_series(df_tmp, plt)
         plt.title("Roll-Pitch-Yaw-Error")
         plt.ylabel("rad")
         pdf.savefig()
@@ -280,7 +274,7 @@ def main():
             ["timestamp", "T_vehicle_attitude_0__NF_tilt_more_90"]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
-        pltw.plot_time_series(df_tmp, plt)
+        plot_time_series(df_tmp, plt)
         plt.title("Inverted")
         plt.ylabel("boolean")
         pdf.savefig()
@@ -305,10 +299,14 @@ def main():
         df_tmp["MPC_MAN_TILT_MAX"] = man_tilt * np.pi / 180
         df_tmp.plot(x="timestamp", linewidth=0.8, style=["-", "-", "--", "--"])
 
-        pltw.plot_time_series(df_tmp, plt)
+        plot_time_series(df_tmp, plt)
         plt.title("Tilt / Desired Tilt")
         plt.ylabel("rad")
         pdf.savefig()
         plt.close(2)
 
         print("px4_attitude.pdf was created")
+
+
+if __name__ == "__main__":
+    main()

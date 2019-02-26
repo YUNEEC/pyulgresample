@@ -13,7 +13,7 @@ from pyulgresample import ulogconv as conv
 from pyulgresample import mathpandas as mpd
 from pyulgresample import plotwrapper as pltw
 from pyulgresample import loginfo
-from pyulgresample import dfUlg
+from pyulgresample.ulogdataframe import DfUlg, TopicMsgs
 
 import matplotlib
 
@@ -23,35 +23,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 parser = argparse.ArgumentParser(description="Script to process attitude")
 parser.add_argument("filename", metavar="file.ulg", help="ulog file")
-
-
-class dfUlgPosition(dfUlg.dfUlgBase):
-    """dfUlgBase-Childclass for local position- and setpoint-topics.
-
-    Store required topics and messages,
-    compute new messages and add them to the dataframe.
-
-    Arguments:
-    dfUlg.dfUlgBase -- Parentclass
-
-    """
-
-    @classmethod
-    def get_required_topics(cls):
-        """Return a list with the required topics."""
-        return ["vehicle_local_position", "vehicle_local_position_setpoint"]
-
-    @classmethod
-    def get_required_zoh_topics(cls):
-        """Return a list of topics for which zero order hold is applied."""
-        return []
-
-    @classmethod
-    def get_nan_topic_msgs(self):
-        """Return a list of TopicMsgs wich are nan."""
-        return [
-            dfUlg.TopicMsgs("vehicle_local_position_setpoint", ["x", "y", "z"])
-        ]
 
 
 def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
@@ -71,7 +42,7 @@ def print_pdf(df, pdf, topic_1, topic_2, title, y_label, iterator):
     plt.figure(iterator, figsize=(20, 13))
     df_tmp = df[["timestamp", topic_1, topic_2]].copy()
     df_tmp.plot(x="timestamp", linewidth=0.8)
-    pltw.plot_time_series(df_tmp, plt)
+    plot_time_series(df_tmp, plt)
     plt.title(title)
     plt.ylabel(y_label)
     pdf.savefig()
@@ -100,11 +71,37 @@ def add_horizontal_distance(df):
     ] = abs_horizontal_dist.values
 
 
+def plot_time_series(df, plt):
+    """Plot a time series.
+
+    Arguments:
+    df -- dataframe containing messages from the required topics
+    plt -- plot
+
+    """
+    # Remove the plot frame lines
+    delta = (df["timestamp"].max() - df["timestamp"].min()) / 10
+    plt.xticks(
+        np.arange(
+            df["timestamp"].min(),
+            df["timestamp"].max(),
+            step=np.around(delta, decimals=1),
+        )
+    )
+    plt.grid()
+
+
 def main():
     """Call methods and create pdf with plots showing relevant data."""
     args = parser.parse_args()
     # create dataframe-ulog class for Position/Position-setpoint topic
-    pos = dfUlgPosition.create(args.filename)
+    pos = DfUlg.create(
+        args.filename,
+        topics=["vehicle_local_position", "vehicle_local_position_setpoint"],
+        # nan_topic_msgs_list=[
+        #    TopicMsgs("vehicle_local_position_setpoint", ["x", "y", "z"])
+        # ],
+    )
 
     with PdfPages("px4_position.pdf") as pdf:
 
@@ -156,3 +153,7 @@ def main():
         )
 
         print("px4_position.pdf was created")
+
+
+if __name__ == "__main__":
+    main()

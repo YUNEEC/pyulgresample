@@ -11,9 +11,8 @@ import os
 import pyulog
 from pyulgresample import ulogconv as conv
 from pyulgresample import mathpandas as mpd
-from pyulgresample import plotwrapper as pltw
 from pyulgresample import loginfo
-from pyulgresample import dfUlg
+from pyulgresample.ulogdataframe import DfUlg, TopicMsgs
 
 import matplotlib
 
@@ -25,38 +24,6 @@ parser = argparse.ArgumentParser(
     description="Script to process global position"
 )
 parser.add_argument("filename", metavar="file.ulg", help="ulog file")
-
-
-class dfUlgPositionGlobal(dfUlg.dfUlgBase):
-    """dfUlgBase-Childclass for global position- and setpoint-topics.
-
-    Store required topics and messages,
-    compute new messages and add them to the dataframe.
-
-    Arguments:
-    dfUlg.dfUlgBase -- Parentclass
-
-    """
-
-    @classmethod
-    def get_required_topics(cls):
-        """Return a list with the required topics."""
-        return [
-            "vehicle_global_position",
-            "vehicle_local_position",
-            "position_setpoint_triplet",
-            "vehicle_status",
-        ]
-
-    @classmethod
-    def get_required_zoh_topics(cls):
-        """Return a list of topics for which zero order hold is applied."""
-        return ["position_setpoint_triplet", "vehicle_status"]
-
-    @classmethod
-    def get_nan_topic_msgs(self):
-        """Return a list of TopicMsgs wich are nan."""
-        return []
 
 
 def apply_UTM_constraints(df):
@@ -196,11 +163,43 @@ def add_UTM_position_relative_to_reference(df):
     )
 
 
+def plot_time_series(df, plt):
+    """Plot a time series.
+
+    Arguments:
+    df -- dataframe containing messages from the required topics
+    plt -- plot
+
+    """
+    # Remove the plot frame lines
+    delta = (df["timestamp"].max() - df["timestamp"].min()) / 10
+    plt.xticks(
+        np.arange(
+            df["timestamp"].min(),
+            df["timestamp"].max(),
+            step=np.around(delta, decimals=1),
+        )
+    )
+    plt.grid()
+
+
 def main():
     """Call methods and create pdf with plots showing relevant data."""
     args = parser.parse_args()
     # create dataframe-ulog class for Attitude/Attiutde-setpoint topic
-    posg = dfUlgPositionGlobal.create(args.filename)
+    posg = DfUlg.create(
+        args.filename,
+        topics=[
+            "vehicle_global_position",
+            "vehicle_local_position",
+            "position_setpoint_triplet",
+            "vehicle_status",
+        ],
+        zoh_topic_msgs_list=[
+            TopicMsgs("position_setpoint_triplet", []),
+            TopicMsgs("vehicle_status", []),
+        ],
+    )
     posg.df = apply_UTM_constraints(posg.df)  # apply UTM constraints
 
     # store the values for all auto navigation states in a list
@@ -313,7 +312,7 @@ def main():
             ]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
-        pltw.plot_time_series(df_tmp, plt)
+        plot_time_series(df_tmp, plt)
         plt.title("UTM setpoint/state-trajectory")
         plt.ylabel("meters")
         plt.xlabel("meters")
@@ -328,7 +327,7 @@ def main():
             ["timestamp", "T_vehicle_status_0__F_nav_state"]
         ].copy()
         df_tmp.plot(x="timestamp", linewidth=0.8)
-        pltw.plot_time_series(df_tmp, plt)
+        plot_time_series(df_tmp, plt)
         plt.title("vehicle status")
         plt.ylabel("meters")
         plt.xlabel("meters")
@@ -338,3 +337,7 @@ def main():
         figure_number = figure_number + 1
 
         print("px4_global_to_local.pdf was created")
+
+
+if __name__ == "__main__":
+    main()
