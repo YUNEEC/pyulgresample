@@ -205,7 +205,7 @@ def main():
     # store the values for all auto navigation states in a list
     NAVIGATION_STATE_AUTO = list(range(3, 9))
 
-    with PdfPages("px4_global_to_local.pdf") as pdf:
+    with PdfPages("global_to_local.pdf") as pdf:
 
         add_UTM_from_global_target_setpoin(posg.df)
         add_UTM_from_reference(posg.df)
@@ -336,7 +336,7 @@ def main():
 
         figure_number = figure_number + 1
 
-        print("px4_global_to_local.pdf was created")
+        print("global_to_local.pdf was created")
 
 
 if __name__ == "__main__":
