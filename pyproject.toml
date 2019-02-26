@@ -8,7 +8,6 @@ author = "Dennis Mannhart"
 author-email = "dennis@yuneecresearch.com"
 home-page = "https://github.com/YUNEEC/pyulgresample"
 requires=[
-        "matplotlib (>= 3.0.0)",
         "numpy (>= 1.15.3)",
         "pandas (>= 0.23.4)",
         "pyulog (>= 0.6.0)",
