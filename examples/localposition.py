@@ -61,7 +61,7 @@ def add_horizontal_distance(df):
         name="T_vehicle_local_position_0__NF_abs_horizontal_dist",
     )
 
-    abs_horizontal_dist = mpd.series_pythagoras(
+    abs_horizontal_dist = mpd.series_norm_2d(
         df["T_vehicle_local_position_0__F_x"],
         df["T_vehicle_local_position_0__F_y"],
     )
