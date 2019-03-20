@@ -64,7 +64,7 @@ mkdir ~/.virtualenvs
 Add virtual envrionment working-folder to bashrc and source virtualenvwrapper:
 ```bash
 export WORKON_HOME=$HOME/.virtualenvs
-source $HOME/.local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
 ```
 
 Open new terminal or source bashrc:
