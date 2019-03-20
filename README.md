@@ -17,7 +17,7 @@ This class is a convenient class to specify a topic and messages of interest.
 This class contains a ulog-structure, pandas dataframe-structure and list of topics as class-members. It also contains a factory-method for converting a .ulg-file into class-members.
 
 ### ulogconv
-This module contains a few helper-functions for converting a .ulg-file into pandas-dataframe. It is mainly used by DfUlg.
+This module contains a few helper-functions for converting a .ulg-file into pandas-dataframe. It is mainly used for DfUlg.
 
 ### mathpandas
 Contains time-series functions.
