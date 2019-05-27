@@ -15,7 +15,7 @@ def combine_names(msg_name, new_name):
         return new_name
 
 
-def series_quat2euler(q0, q1, q2, q3, msg_name=""):
+def get_series_quat2euler(q0, q1, q2, q3, msg_name=""):
     """Given pandas series q0-q4, compute series roll, pitch, yaw.
 
     Arguments:
@@ -44,7 +44,7 @@ def series_quat2euler(q0, q1, q2, q3, msg_name=""):
     return roll, pitch, yaw
 
 
-def angle_wrap(x):
+def angle_wrap_pi(x):
     """wrap angle between -pi and pi.
 
     Arguments:
@@ -54,7 +54,7 @@ def angle_wrap(x):
     return np.arcsin(np.sin(x))
 
 
-def series_quatrot(x, y, z, q0, q1, q2, q3, msg_name=""):
+def get_series_quatrot(x, y, z, q0, q1, q2, q3, msg_name=""):
     """Given pandas series x-z and quaternion q0-q4, compute rotated vector x_r, y_r, z_r.
 
     Arguments:
@@ -83,7 +83,7 @@ def series_quatrot(x, y, z, q0, q1, q2, q3, msg_name=""):
     return x_r, y_r, z_r
 
 
-def series_quatrot_inverse(x, y, z, q0, q1, q2, q3, msg_name=""):
+def get_series_quatrot_inverse(x, y, z, q0, q1, q2, q3, msg_name=""):
     """Given pandas series x-z and quaternion q0-q4, compute reversed rotated vector x_r, y_r, z_r.
 
     Arguments:
@@ -94,10 +94,10 @@ def series_quatrot_inverse(x, y, z, q0, q1, q2, q3, msg_name=""):
     rot_name -- name of the rotation
 
     """
-    return series_quatrot(x, y, z, q0, -q1, -q2, -q3, msg_name)
+    return get_series_quatrot(x, y, z, q0, -q1, -q2, -q3, msg_name)
 
 
-def series_dot(x0, y0, z0, x1, y1, z1, msg_name=""):
+def get_series_dot(x0, y0, z0, x1, y1, z1, msg_name=""):
     """Given pandas series x0-z0 and x1-z1, compute dot product.
 
     Arguments:
@@ -119,7 +119,7 @@ def series_dot(x0, y0, z0, x1, y1, z1, msg_name=""):
     )
 
 
-def series_norm_2d(x0, y0, msg_name=""):
+def get_series_norm_2d(x0, y0, msg_name=""):
     """Given pandas series x0-y0, compute norm.
 
     Arguments:
@@ -137,7 +137,7 @@ def series_norm_2d(x0, y0, msg_name=""):
     )
 
 
-def series_utm(lat, lon, msg_name=""):
+def get_series_utm(lat, lon, msg_name=""):
     """Given pandas series lat/lon in degrees, compute UTM easting/northing/zone.
 
     Arguments:
@@ -170,7 +170,7 @@ def series_utm(lat, lon, msg_name=""):
     return easting, northing, zone
 
 
-def z_axis_from_attitude(q0, q1, q2, q3, msg_name=""):
+def get_z_axis_from_attitude(q0, q1, q2, q3, msg_name=""):
     """Compute the desired body z axis in world coordinate system.
 
     Arguments:
@@ -199,11 +199,11 @@ def z_axis_from_attitude(q0, q1, q2, q3, msg_name=""):
         name=combine_names(msg_name, "z_axis_z"),
     )
 
-    x, y, z = series_quatrot(x, y, z, q0, q1, q2, q3)
+    x, y, z = get_series_quatrot(x, y, z, q0, q1, q2, q3)
     return x, y, z
 
 
-def tilt_from_attitude(q0, q1, q2, q3, msg_name=""):
+def get_tilt_from_attitude(q0, q1, q2, q3, msg_name=""):
     """Compute desired tilt angle and add it to the dataframe.
 
     Arguments:
@@ -216,14 +216,50 @@ def tilt_from_attitude(q0, q1, q2, q3, msg_name=""):
     msg_name -- name of the newly created data (default "")
 
     """
-    z_x, z_y, z_z = z_axis_from_attitude(q0, q1, q2, q3)
+    z_x, z_y, z_z = get_z_axis_from_attitude(q0, q1, q2, q3)
 
     x = pd.Series(np.zeros(q0.shape[0]), index=q0.index, name="x")
     y = pd.Series(np.zeros(q0.shape[0]), index=q0.index, name="y")
     z = pd.Series(np.ones(q0.shape[0]), index=q0.index, name="z")
 
-    tilt = series_dot(x, y, z, z_x, z_y, z_z, msg_name)
+    tilt = get_series_dot(x, y, z, z_x, z_y, z_z, msg_name)
     tilt.where(
         tilt < 1, 1, inplace=True
     )  # ensure that angle 1 is never exceeded
     return tilt.apply(np.arccos)
+
+
+def get_normalize_2d_vector(x, y, msg_name=""):
+    """Normalize 2D vector.
+
+    Arguments:
+    x -- pandas time series x component of vector
+    y -- pandas time series y component of vector
+
+    Keyworkd Arguments:
+    msg_name -- name of the newly created data (default "")
+
+    """
+    norm = get_series_norm_2d(x, y, msg_name=msg_name)
+    norm[norm <= np.finfo(np.float64).eps] = np.finfo(np.float64).eps
+
+    x_n = x / norm
+    y_n = y / norm
+    return x_n, y_n
+
+
+def get_heading_from_2d_vector(north, east, msg_name=""):
+    """Compute the heading (0 heading = North) from a 2D vector.
+
+    0 Heading = north is only true if north/east is aligned with GPS coordinate system.
+
+    Arguments:
+    x -- pandas time series x component of vector
+    y -- pandas time series y component of vector
+
+    Keyworkd Arguments:
+    msg_name -- name of the newly created data (default "")
+
+    """
+    x_n, y_n = get_normalize_2d_vector(north, east, msg_name)
+    return np.sign(y_n) * angle_wrap_pi(np.arccos(x_n))
