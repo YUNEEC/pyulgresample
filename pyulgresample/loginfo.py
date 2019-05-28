@@ -97,13 +97,10 @@ def add_param(dfUlg, parameter_name):
     if len(dfUlg.ulog.changed_parameters) > 0 and (
         parameter_name in [x[1] for x in dfUlg.ulog.changed_parameters]
     ):
-        dfUlg.df[parameter_name] = np.nan
         for time, name, value in dfUlg.ulog.changed_parameters:
             if name == parameter_name:
                 dfUlg.df.loc[
-                    (dfUlg.df.timestamp <= time)
-                    & (np.isnan(dfUlg.df[parameter_name])),
-                    parameter_name,
+                    (dfUlg.df.timestamp >= time), parameter_name
                 ] = value
 
         dfUlg.df[parameter_name].fillna(method="ffill", inplace=True)

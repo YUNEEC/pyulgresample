@@ -76,6 +76,27 @@ def test_add_parameter():
 
     # should have only one value for MPC_XY_P
     loginfo.add_param(lm, "MPC_XY_P")
-    lm.df["MPC_XY_P"].to_csv("tt.txt")
     group = lm.df.groupby("MPC_XY_P")
     assert group.ngroups == 1
+
+    # you can find the parameter changes from ulog: lm.ulog.changed_parameters
+    # between 34 and 48.5 seconds, we should have MPC_YAW_MODE 1
+    assert all(
+        lm.df[
+            (lm.df["timestamp"] * 1e-6 > 34.0)
+            & (lm.df["timestamp"] * 1e-6 < 48.0)
+        ]["MPC_YAW_MODE"]
+        == 1
+    )
+
+    # between 49 and 53.5 seconds, MPC_YAW_MODE should be 3
+    assert all(
+        lm.df[
+            (lm.df["timestamp"] * 1e-6 > 49)
+            & (lm.df["timestamp"] * 1e-6 < 53.5)
+        ]["MPC_YAW_MODE"]
+        == 3
+    )
+
+    # between 54 to then end, MPC_YAW_MODE equal 0
+    assert all(lm.df[(lm.df["timestamp"] * 1e-6 > 54.1)]["MPC_YAW_MODE"] == 0)
