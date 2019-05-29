@@ -45,7 +45,7 @@ def get_series_quat2euler(q0, q1, q2, q3, msg_name=""):
 
 
 def angle_wrap_pi(x):
-    """wrap angle between -pi and pi.
+    """wrap angle to [-pi, pi).
 
     Arguments:
     x -- angle to be wrapped
