@@ -51,7 +51,7 @@ def angle_wrap_pi(x):
     x -- angle to be wrapped
 
     """
-    return np.arcsin(np.sin(x))
+    return (x - np.pi) % (2 * np.pi) - np.pi
 
 
 def get_series_quatrot(x, y, z, q0, q1, q2, q3, msg_name=""):
