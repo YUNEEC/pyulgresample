@@ -5,4 +5,4 @@ The package also contains convenient functions to exctact addional information
 from the ulog topics.
 
 """
-__version__ = "0.0.4"
+__version__ = "0.0.5"
