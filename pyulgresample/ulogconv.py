@@ -19,14 +19,20 @@ def create_pandadict(ULog):
 
     """
     # column replacement
-    col_rename = {"[": "_", "]": "", ".": "_"}
+    col_rename = {
+        "[": "_",
+        "]": "",
+        ".": "_",
+    }  # creates a dictionnary for replacing [ ] . by _ _
     col_rename_pattern = re.compile(
         r"(" + "|".join([re.escape(key) for key in col_rename.keys()]) + r")"
     )
 
     pandadict = {}
     for msg in ULog.data_list:
-        msg_data = pd.DataFrame.from_dict(msg.data)
+        msg_data = pd.DataFrame.from_dict(
+            msg.data
+        )  # reads from dictionnary into a dataframe
         msg_data.columns = [
             col_rename_pattern.sub(lambda x: col_rename[x.group()], col)
             for col in msg_data.columns
@@ -42,7 +48,7 @@ def create_pandadict(ULog):
         msg_data.index = pd.TimedeltaIndex(
             msg_data["timestamp"] * 1e3, unit="ns"
         )
-        pandadict["T_{:s}_{:d}".format(msg.name, msg.multi_id)] = msg_data
+        pandadict[f"T_{msg.name}_{msg.multi_id}"] = msg_data
 
     return pandadict
 
