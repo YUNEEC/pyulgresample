@@ -103,7 +103,7 @@ flit install -s
 The `-s` stands for symlink which gives the option to test changes without reinstalling the package.
 
 
-The projcet uses [black](https://github.com/ambv/black) for code-formatting and [flake8](https://pypi.org/project/flake8/) for style-guide enforcement. [pre-commit-framework](https://github.com/pre-commit/pre-commit) is used to ensure that each commit first gets adjusted through `blake` and then checked by `flake8`. [PEP257](https://github.com/FalconSocial/pre-commit-mirrors-pep257) docstring style checker is used as well. We need to add `pre-commit` to our
+The project uses [black](https://github.com/ambv/black) for code-formatting and [flake8](https://pypi.org/project/flake8/) for style-guide enforcement. [pre-commit-framework](https://github.com/pre-commit/pre-commit) is used to ensure that each commit first gets adjusted through `blake` and then checked by `flake8`. [PEP257](https://github.com/FalconSocial/pre-commit-mirrors-pep257) docstring style checker is used as well. We need to add `pre-commit` to our
 system:
 ```bash
 pre-commit install
